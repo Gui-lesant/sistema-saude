@@ -8,23 +8,13 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Normalize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #059669;
-            --accent-color: #7c3aed;
-        }
-        
         .loading {
             display: inline-block;
             width: 20px;
@@ -44,78 +34,105 @@
         }
         
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* Animações */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
         
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .grid-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .contact-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .filter-active {
+            background-color: #3b82f6;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
+    <header class="bg-white shadow-sm border-b sticky top-0 z-40">
         <div class="container mx-auto px-4 py-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center mb-4 md:mb-0">
-                    <i class="fas fa-hospital-alt text-2xl text-blue-600 mr-3"></i>
-                    <h1 class="text-2xl font-bold text-gray-800">Gestão em Saúde - Passo Fundo</h1>
+                    <i class="fas fa-hospital-alt text-3xl text-blue-600 mr-3"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Gestão em Saúde - Passo Fundo</h1>
+                        <p class="text-sm text-gray-600">Dashboard interativo para gestão de unidades de saúde</p>
+                    </div>
                 </div>
                 
-                <div class="flex items-center space-x-4">
-                    <button id="refreshBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i> Atualizar Dados
+                <div class="flex items-center space-x-3">
+                    <button id="refreshBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors shadow-sm">
+                        <i class="fas fa-sync-alt mr-2"></i> Atualizar
                     </button>
                     
-                    <button id="exportBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                        <i class="fas fa-file-pdf mr-2"></i> Exportar PDF
+                    <button id="exportBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors shadow-sm">
+                        <i class="fas fa-file-pdf mr-2"></i> PDF
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <!-- Filtros e Busca -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8 fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar Unidade/Profissional</label>
-                    <input type="text" id="searchInput" placeholder="Digite para buscar..." 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Sistema de Filtros Avançados -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6 fade-in">
+            <div class="flex flex-col lg:flex-row gap-6">
+                <!-- Busca Principal -->
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-search mr-1"></i> Busca Avançada
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Buscar por unidade, enfermeiro, endereço, telefone..." 
+                               class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm">
+                        <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                    </div>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Território</label>
-                    <select id="territorioFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        <option value="">Todos os Territórios</option>
+                <!-- Filtro Rápido -->
+                <div class="lg:w-64">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-filter mr-1"></i> Filtro Rápido
+                    </label>
+                    <select id="quickFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm">
+                        <option value="">Todos os registros</option>
+                        <option value="vacina:Sim">Com Sala de Vacina</option>
+                        <option value="vacina:Não">Sem Sala de Vacina</option>
+                        <option value="tipo:ESF">Apenas ESF</option>
+                        <option value="tipo:UBS">Apenas UBS</option>
+                        <option value="territorio:UPF">Território UPF</option>
+                        <option value="territorio:UFFS">Território UFFS</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Filtros em Lote -->
+            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="flex flex-col">
+                    <span class="text-xs text-gray-500 mb-1">Território</span>
+                    <select id="territorioFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                        <option value="">Todos</option>
                         <option value="UPF">UPF</option>
                         <option value="UFFS">UFFS</option>
                         <option value="IMED">IMED</option>
@@ -123,292 +140,553 @@
                     </select>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Tipo</label>
-                    <select id="tipoFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        <option value="">Todos os Tipos</option>
+                <div class="flex flex-col">
+                    <span class="text-xs text-gray-500 mb-1">Tipo Unidade</span>
+                    <select id="tipoFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                        <option value="">Todos</option>
                         <option value="ESF">ESF</option>
                         <option value="UBS">UBS</option>
                         <option value="CAPS">CAPS</option>
                         <option value="CAIS">CAIS</option>
+                        <option value="Amb">Ambulatório</option>
                     </select>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Status Vacina</label>
-                    <select id="vacinaFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <div class="flex flex-col">
+                    <span class="text-xs text-gray-500 mb-1">Status Vacina</span>
+                    <select id="vacinaFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
                         <option value="">Todos</option>
-                        <option value="Sim">Com Sala de Vacina</option>
-                        <option value="Não">Sem Sala de Vacina</option>
+                        <option value="Sim">Com Vacina</option>
+                        <option value="Não">Sem Vacina</option>
+                    </select>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs text-gray-500 mb-1">Equipe</span>
+                    <select id="equipeFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                        <option value="">Todas</option>
+                        <option value="medico">Com Médico</option>
+                        <option value="odonto">Com Odonto</option>
+                        <option value="multi">Com Multiprofissional</option>
                     </select>
                 </div>
             </div>
             
-            <div class="flex justify-between items-center">
-                <button id="clearFilters" class="text-gray-600 hover:text-gray-800 flex items-center transition-colors">
-                    <i class="fas fa-times mr-1"></i> Limpar Filtros
-                </button>
-                
-                <div class="text-sm text-gray-600">
-                    <span id="resultCount">0</span> unidades encontradas
+            <!-- Controles -->
+            <div class="mt-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-600" id="resultCount">0 unidades</span>
+                    <span class="text-sm text-gray-400" id="selectedCount"></span>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="clearFilters" class="text-sm text-gray-600 hover:text-gray-800 px-3 py-1 rounded border border-gray-300 hover:border-gray-400 transition-colors">
+                        <i class="fas fa-times mr-1"></i> Limpar Filtros
+                    </button>
+                    <button id="toggleView" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded transition-colors">
+                        <i class="fas fa-th-large mr-1"></i> Alternar Visualização
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Métricas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-lg bg-blue-100 text-blue-600 mr-4">
-                        <i class="fas fa-hospital text-xl"></i>
-                    </div>
+        <!-- Métricas em Tempo Real -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-blue-500">
+                <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Total de Unidades</p>
-                        <h3 class="text-2xl font-bold text-gray-800" id="totalUnits">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="totalUnits">0</h3>
                     </div>
+                    <i class="fas fa-hospital text-blue-500 text-xl"></i>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-lg bg-green-100 text-green-600 mr-4">
-                        <i class="fas fa-syringe text-xl"></i>
-                    </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-green-500">
+                <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Com Sala de Vacina</p>
-                        <h3 class="text-2xl font-bold text-gray-800" id="vacinaUnits">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="vacinaUnits">0</h3>
                     </div>
+                    <i class="fas fa-syringe text-green-500 text-xl"></i>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-lg bg-purple-100 text-purple-600 mr-4">
-                        <i class="fas fa-map-marker-alt text-xl"></i>
-                    </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-purple-500">
+                <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Diferentes Territórios</p>
-                        <h3 class="text-2xl font-bold text-gray-800" id="territoriosCount">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="territoriosCount">0</h3>
                     </div>
+                    <i class="fas fa-map-marker-alt text-purple-500 text-xl"></i>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-lg bg-orange-100 text-orange-600 mr-4">
-                        <i class="fas fa-user-nurse text-xl"></i>
-                    </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-orange-500">
+                <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Unidades ESF</p>
-                        <h3 class="text-2xl font-bold text-gray-800" id="esfUnits">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="esfUnits">0</h3>
                     </div>
+                    <i class="fas fa-user-md text-orange-500 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Tabela de Unidades -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden fade-in">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800">Unidades de Saúde</h2>
+        <!-- Área de Resultados -->
+        <div id="resultsArea">
+            <!-- Vista em Cards (padrão) -->
+            <div id="cardsView" class="grid-stack fade-in">
+                <!-- Cards serão gerados aqui -->
             </div>
             
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="unidade">
-                                Unidade <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="enfermeiro">
-                                Enfermeiro <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="gerente">
-                                Gerente <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Contatos
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="vacina">
-                                Vacina <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="territorio">
-                                Território <i class="fas fa-sort ml-1"></i>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Dados serão carregados aqui -->
-                    </tbody>
-                </table>
+            <!-- Vista em Tabela -->
+            <div id="tableView" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="unidade">
+                                    Unidade <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="enfermeiro">
+                                    Enfermeiro <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Contatos
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="vacina">
+                                    Vacina <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable" data-sort="territorio">
+                                    Território <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Dados da tabela -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
-            <div id="loadingIndicator" class="p-8 text-center">
-                <div class="loading mx-auto mb-2"></div>
-                <p class="text-gray-600">Carregando dados...</p>
+            <!-- Estado de Carregamento -->
+            <div id="loadingState" class="text-center py-12">
+                <div class="loading mx-auto mb-4" style="border-top-color: #3b82f6; width: 40px; height: 40px;"></div>
+                <p class="text-gray-600">Conectando à planilha e carregando dados...</p>
+                <p class="text-sm text-gray-400 mt-2" id="loadingDetail"></p>
             </div>
             
-            <div id="noResults" class="p-8 text-center hidden">
+            <!-- Estado Sem Resultados -->
+            <div id="noResults" class="hidden text-center py-12">
                 <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
-                <p class="text-gray-600">Nenhuma unidade encontrada com os filtros aplicados.</p>
+                <p class="text-gray-600 text-lg">Nenhuma unidade encontrada</p>
+                <p class="text-gray-400 mt-1">Tente ajustar os filtros de busca</p>
             </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="unitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Detalhes da Unidade</h3>
+                        <p class="text-gray-600 mt-1" id="modalSubtitle"></p>
+                    </div>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600 bg-white rounded-full p-2 shadow-sm">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]" id="modalContent">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t mt-12">
         <div class="container mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="text-gray-600 mb-4 md:mb-0">
-                    <p>Dados atualizados da planilha oficial de saúde</p>
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
+                <div class="mb-4 md:mb-0">
+                    <p>Dashboard de Gestão em Saúde - Prefeitura de Passo Fundo</p>
                 </div>
-                <div class="text-gray-500 text-sm">
-                    <p>Última atualização: <span id="lastUpdate">-</span></p>
+                <div class="flex items-center space-x-4">
+                    <span>Dados da planilha oficial</span>
+                    <span>•</span>
+                    <span id="lastUpdate">Última atualização: -</span>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Modal de Detalhes -->
-    <div id="unitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-semibold text-gray-800" id="modalTitle">Detalhes da Unidade</h3>
-                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-2xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6" id="modalContent">
-                <!-- Conteúdo do modal será preenchido via JavaScript -->
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Configurações
+        // Configuração principal
         const CONFIG = {
             spreadsheetId: '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ',
             gid: '291026320',
-            apiKey: 'AIzaSyBzq9x9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9Q9', // Esta é uma chave de exemplo - substitua pela sua
-            cacheTimeout: 15 * 60 * 1000 // 15 minutos
+            cacheTimeout: 10 * 60 * 1000, // 10 minutos
+            useOpenSheet: true // Usa opensheet.elk.sh como proxy
         };
 
         // Estado da aplicação
         let appState = {
             allData: [],
             filteredData: [],
+            currentView: 'cards',
             currentSort: { field: 'unidade', direction: 'asc' },
             filters: {
                 search: '',
+                quick: '',
                 territorio: '',
                 tipo: '',
-                vacina: ''
+                vacina: '',
+                equipe: ''
             }
         };
 
         // Elementos DOM
         const elements = {
-            tableBody: document.getElementById('tableBody'),
-            loadingIndicator: document.getElementById('loadingIndicator'),
-            noResults: document.getElementById('noResults'),
+            // Filtros
             searchInput: document.getElementById('searchInput'),
+            quickFilter: document.getElementById('quickFilter'),
             territorioFilter: document.getElementById('territorioFilter'),
             tipoFilter: document.getElementById('tipoFilter'),
             vacinaFilter: document.getElementById('vacinaFilter'),
+            equipeFilter: document.getElementById('equipeFilter'),
             clearFilters: document.getElementById('clearFilters'),
-            refreshBtn: document.getElementById('refreshBtn'),
-            exportBtn: document.getElementById('exportBtn'),
+            toggleView: document.getElementById('toggleView'),
+            
+            // Resultados
+            cardsView: document.getElementById('cardsView'),
+            tableView: document.getElementById('tableView'),
+            tableBody: document.getElementById('tableBody'),
+            loadingState: document.getElementById('loadingState'),
+            noResults: document.getElementById('noResults'),
+            resultsArea: document.getElementById('resultsArea'),
+            
+            // Métricas
             resultCount: document.getElementById('resultCount'),
+            selectedCount: document.getElementById('selectedCount'),
             totalUnits: document.getElementById('totalUnits'),
             vacinaUnits: document.getElementById('vacinaUnits'),
             territoriosCount: document.getElementById('territoriosCount'),
             esfUnits: document.getElementById('esfUnits'),
             lastUpdate: document.getElementById('lastUpdate'),
+            loadingDetail: document.getElementById('loadingDetail'),
+            
+            // Ações
+            refreshBtn: document.getElementById('refreshBtn'),
+            exportBtn: document.getElementById('exportBtn'),
+            
+            // Modal
             unitModal: document.getElementById('unitModal'),
             modalTitle: document.getElementById('modalTitle'),
+            modalSubtitle: document.getElementById('modalSubtitle'),
             modalContent: document.getElementById('modalContent'),
             closeModal: document.getElementById('closeModal')
         };
 
-        // Gerenciador de dados
-        class DataManager {
+        // Classe principal da aplicação
+        class HealthDashboardApp {
             constructor() {
-                this.cacheKey = 'saude-pf-data';
-                this.lastUpdateKey = 'saude-pf-last-update';
+                this.dataManager = new DataManager();
+                this.renderer = new Renderer();
+                this.filterEngine = new FilterEngine();
+                this.init();
             }
 
-            async fetchData() {
-                // Verificar cache primeiro
-                const cached = this.getCachedData();
-                if (cached) {
-                    console.log('Usando dados em cache');
-                    return cached;
+            async init() {
+                this.setupEventListeners();
+                await this.loadData();
+                this.updateLastUpdateTime();
+            }
+
+            async loadData() {
+                this.showLoading('Conectando à planilha...');
+                
+                try {
+                    const data = await this.dataManager.fetchData();
+                    if (data && data.length > 0) {
+                        appState.allData = data;
+                        this.applyFilters();
+                        this.hideLoading();
+                    } else {
+                        this.showError('Não foi possível carregar os dados da planilha');
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    this.showError('Erro de conexão. Verifique o acesso à planilha.');
                 }
+            }
+
+            applyFilters() {
+                // Coletar filtros
+                const filters = {
+                    search: elements.searchInput.value,
+                    quick: elements.quickFilter.value,
+                    territorio: elements.territorioFilter.value,
+                    tipo: elements.tipoFilter.value,
+                    vacina: elements.vacinaFilter.value,
+                    equipe: elements.equipeFilter.value
+                };
+
+                appState.filters = filters;
+                
+                // Aplicar filtros
+                appState.filteredData = this.filterEngine.applyFilters(appState.allData, filters);
+                
+                // Ordenar
+                appState.filteredData = this.filterEngine.sortData(
+                    appState.filteredData, 
+                    appState.currentSort.field, 
+                    appState.currentSort.direction
+                );
+                
+                // Atualizar UI
+                this.renderer.renderResults(appState.filteredData);
+                this.updateMetrics();
+                this.updateResultCount();
+            }
+
+            updateMetrics() {
+                const data = appState.filteredData;
+                
+                elements.totalUnits.textContent = data.length;
+                elements.vacinaUnits.textContent = data.filter(u => u.sala_vacina_ativa?.includes('Sim')).length;
+                elements.territoriosCount.textContent = new Set(data.map(u => u.territorio).filter(Boolean)).size;
+                elements.esfUnits.textContent = data.filter(u => u.unidade?.includes('ESF')).length;
+            }
+
+            updateResultCount() {
+                const total = appState.filteredData.length;
+                const selected = appState.filters.search || appState.filters.quick || 
+                               appState.filters.territorio || appState.filters.tipo || 
+                               appState.filters.vacina || appState.filters.equipe;
+                
+                elements.resultCount.textContent = `${total} unidade${total !== 1 ? 's' : ''}`;
+                
+                if (selected && appState.allData.length !== total) {
+                    elements.selectedCount.textContent = `(${total} de ${appState.allData.length} filtradas)`;
+                } else {
+                    elements.selectedCount.textContent = '';
+                }
+            }
+
+            updateLastUpdateTime() {
+                const timestamp = localStorage.getItem('saude-pf-last-update');
+                if (timestamp) {
+                    const date = new Date(parseInt(timestamp));
+                    elements.lastUpdate.textContent = `Última atualização: ${date.toLocaleString('pt-BR')}`;
+                }
+            }
+
+            showLoading(message = 'Carregando...') {
+                elements.loadingState.classList.remove('hidden');
+                elements.cardsView.classList.add('hidden');
+                elements.tableView.classList.add('hidden');
+                elements.noResults.classList.add('hidden');
+                elements.loadingDetail.textContent = message;
+            }
+
+            hideLoading() {
+                elements.loadingState.classList.add('hidden');
+            }
+
+            showError(message) {
+                this.hideLoading();
+                // Em uma versão mais elaborada, poderia mostrar um toast de erro
+                console.error(message);
+                alert(`Erro: ${message}`);
+            }
+
+            setupEventListeners() {
+                // Busca em tempo real com debounce
+                let searchTimeout;
+                elements.searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => this.applyFilters(), 300);
+                });
+
+                // Filtros
+                [elements.quickFilter, elements.territorioFilter, elements.tipoFilter, 
+                 elements.vacinaFilter, elements.equipeFilter].forEach(filter => {
+                    filter.addEventListener('change', () => this.applyFilters());
+                });
+
+                // Limpar filtros
+                elements.clearFilters.addEventListener('click', () => {
+                    elements.searchInput.value = '';
+                    elements.quickFilter.value = '';
+                    elements.territorioFilter.value = '';
+                    elements.tipoFilter.value = '';
+                    elements.vacinaFilter.value = '';
+                    elements.equipeFilter.value = '';
+                    this.applyFilters();
+                });
+
+                // Alternar visualização
+                elements.toggleView.addEventListener('click', () => {
+                    appState.currentView = appState.currentView === 'cards' ? 'table' : 'cards';
+                    elements.toggleView.innerHTML = appState.currentView === 'cards' 
+                        ? '<i class="fas fa-th-large mr-1"></i> Visualização em Tabela'
+                        : '<i class="fas fa-grip-horizontal mr-1"></i> Visualização em Cards';
+                    this.applyFilters();
+                });
+
+                // Ordenação da tabela
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.sortable')) {
+                        const field = e.target.closest('.sortable').dataset.sort;
+                        this.sortTable(field);
+                    }
+                });
+
+                // Ações principais
+                elements.refreshBtn.addEventListener('click', async () => {
+                    localStorage.removeItem('saude-pf-data');
+                    localStorage.removeItem('saude-pf-last-update');
+                    await this.loadData();
+                });
+
+                elements.exportBtn.addEventListener('click', () => {
+                    this.exportToPDF();
+                });
+
+                // Modal
+                elements.closeModal.addEventListener('click', () => {
+                    elements.unitModal.classList.add('hidden');
+                });
+
+                elements.unitModal.addEventListener('click', (e) => {
+                    if (e.target === elements.unitModal) {
+                        elements.unitModal.classList.add('hidden');
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        elements.unitModal.classList.add('hidden');
+                    }
+                });
+            }
+
+            sortTable(field) {
+                if (appState.currentSort.field === field) {
+                    appState.currentSort.direction = appState.currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    appState.currentSort = { field, direction: 'asc' };
+                }
+                this.applyFilters();
+            }
+
+            exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(16);
+                doc.text('Relatório de Unidades de Saúde - Passo Fundo', 20, 20);
+                
+                doc.setFontSize(10);
+                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 30);
+                doc.text(`Total de unidades: ${appState.filteredData.length}`, 20, 40);
+                
+                let y = 50;
+                appState.filteredData.forEach((unit, index) => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${index + 1}. ${unit.unidade || 'N/A'}`, 20, y);
+                    y += 6;
+                    
+                    doc.setFont(undefined, 'normal');
+                    if (unit.enfermeiro) {
+                        doc.text(`   Enfermeiro: ${unit.enfermeiro}`, 25, y);
+                        y += 5;
+                    }
+                    if (unit.telefone) {
+                        doc.text(`   Telefone: ${unit.telefone}`, 25, y);
+                        y += 5;
+                    }
+                    if (unit.endereco) {
+                        doc.text(`   Endereço: ${unit.endereco}`, 25, y);
+                        y += 5;
+                    }
+                    y += 3;
+                });
+                
+                doc.save(`unidades-saude-${new Date().toISOString().split('T')[0]}.pdf`);
+            }
+        }
+
+        // Gerenciador de dados
+        class DataManager {
+            async fetchData() {
+                // Verificar cache
+                const cached = this.getCachedData();
+                if (cached) return cached;
 
                 // Buscar dados atualizados
-                console.log('Buscando dados atualizados...');
                 const freshData = await this.fetchFromSheets();
                 if (freshData && freshData.length > 0) {
                     this.setCachedData(freshData);
-                    this.setLastUpdate();
+                    localStorage.setItem('saude-pf-last-update', Date.now().toString());
                 }
                 return freshData;
             }
 
             async fetchFromSheets() {
                 try {
-                    // Para GitHub Pages, vamos usar uma abordagem mais simples
-                    // Em produção, você precisaria de uma chave API válida
+                    // Usando opensheet.elk.sh como proxy (funciona sem CORS)
                     const response = await fetch(
                         `https://opensheet.elk.sh/${CONFIG.spreadsheetId}/${CONFIG.gid}`
                     );
                     
-                    if (!response.ok) {
-                        throw new Error('Erro ao buscar dados');
-                    }
+                    if (!response.ok) throw new Error('Erro na resposta da API');
                     
                     const data = await response.json();
-                    return this.processSheetData(data);
+                    return this.processData(data);
                 } catch (error) {
                     console.error('Erro ao buscar dados:', error);
-                    // Tentar usar dados de exemplo se a API falhar
-                    return this.getSampleData();
+                    return this.getFallbackData();
                 }
             }
 
-            processSheetData(data) {
-                if (!data || data.length === 0) return [];
-                
-                return data.map(row => {
-                    // Mapear colunas dinamicamente
-                    return {
-                        unidade: row.UNIDADE || row.unidade || '',
-                        enfermeiro: row.ENFERMEIRO || row.enfermeiro || '',
-                        tecnico_enfermagem: row['TEC. ENFERMAGEM'] || row.tecnico_enfermagem || '',
-                        medico: row.MEDICO || row.medico || '',
-                        odonto: row.ODONTO || row.odonto || '',
-                        multi: row.MULTI || row.multi || '',
-                        acs: row.ACS || row.acs || '',
-                        ace: row.ACE || row.ace || '',
-                        gerente: row.GERENTE || row.gerente || '',
-                        email: row.EMAIL || row.email || '',
-                        recepcao: row.RECEPÇÃO || row.recepcao || '',
-                        sanificacao: row.SANIFICAÇÃO || row.sanificacao || '',
-                        porteiro: row.PORTEIRO || row.porteiro || '',
-                        telefone: row.TELEFONE || row.telefone || '',
-                        endereco: row.ENDEREÇO || row.endereco || '',
-                        sala_vacina_ativa: row['Sala de Vacina ativa'] || row.sala_vacina_ativa || '',
-                        atividades: row.Atividades || row.atividades || '',
-                        territorio: row.Território || row.territorio || ''
-                    };
-                });
+            processData(data) {
+                return data.map(row => ({
+                    // Mapeamento dinâmico das colunas
+                    unidade: row.UNIDADE || row.unidade || '',
+                    enfermeiro: row.ENFERMEIRO || row.enfermeiro || '',
+                    tecnico_enfermagem: row['TEC. ENFERMAGEM'] || row.tecnico_enfermagem || '',
+                    medico: row.MEDICO || row.medico || '',
+                    odonto: row.ODONTO || row.odonto || '',
+                    multi: row.MULTI || row.multi || '',
+                    acs: row.ACS || row.acs || '',
+                    ace: row.ACE || row.ace || '',
+                    gerente: row.GERENTE || row.gerente || '',
+                    email: row.EMAIL || row.email || '',
+                    recepcao: row.RECEPÇÃO || row.recepcao || '',
+                    sanificacao: row.SANIFICAÇÃO || row.sanificacao || '',
+                    porteiro: row.PORTEIRO || row.porteiro || '',
+                    telefone: row.TELEFONE || row.telefone || '',
+                    endereco: row.ENDEREÇO || row.endereco || '',
+                    sala_vacina_ativa: row['Sala de Vacina ativa'] || row.sala_vacina_ativa || '',
+                    atividades: row.Atividades || row.atividades || '',
+                    territorio: row.Território || row.territorio || ''
+                }));
             }
 
             getCachedData() {
                 try {
-                    const cached = localStorage.getItem(this.cacheKey);
-                    const timestamp = localStorage.getItem(this.lastUpdateKey);
+                    const cached = localStorage.getItem('saude-pf-data');
+                    const timestamp = localStorage.getItem('saude-pf-last-update');
                     
                     if (cached && timestamp) {
                         const age = Date.now() - parseInt(timestamp);
@@ -424,24 +702,14 @@
 
             setCachedData(data) {
                 try {
-                    localStorage.setItem(this.cacheKey, JSON.stringify(data));
-                    this.setLastUpdate();
+                    localStorage.setItem('saude-pf-data', JSON.stringify(data));
                 } catch (e) {
                     console.warn('Erro ao salvar cache:', e);
                 }
             }
 
-            setLastUpdate() {
-                try {
-                    localStorage.setItem(this.lastUpdateKey, Date.now().toString());
-                    elements.lastUpdate.textContent = new Date().toLocaleString('pt-BR');
-                } catch (e) {
-                    console.warn('Erro ao salvar timestamp:', e);
-                }
-            }
-
-            getSampleData() {
-                // Dados de exemplo para demonstração
+            getFallbackData() {
+                // Dados de fallback para demonstração
                 return [
                     {
                         unidade: "ESF 1º Centenário",
@@ -452,279 +720,344 @@
                         email: "esfcentenario@pmpf.rs.gov.br",
                         sala_vacina_ativa: "Não",
                         territorio: "UPF"
-                    },
-                    {
-                        unidade: "ESF Adirbal Corralo", 
-                        enfermeiro: "Solange Soares, Adiane Bagatini",
-                        gerente: "Fabiana Veronese",
-                        telefone: "3314-8344",
-                        endereco: "R. Uruguaiana, s/n° - Vila Fátima",
-                        email: "esfadirbal@pmpf.rs.gov.br",
-                        sala_vacina_ativa: "Sim vac COVID",
-                        territorio: "UPF"
                     }
                 ];
             }
         }
 
-        // Motor de busca
-        class SearchEngine {
-            constructor(data) {
-                this.data = data;
-            }
-
-            search(term, filters) {
-                if (!term && !filters.territorio && !filters.tipo && !filters.vacina) {
-                    return this.data;
-                }
-
-                const searchTerm = term ? term.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
-                
-                return this.data.filter(item => {
-                    // Busca por termo
-                    if (searchTerm) {
-                        const searchableFields = [
-                            item.unidade, 
-                            item.enfermeiro, 
-                            item.gerente, 
-                            item.endereco,
+        // Motor de filtros
+        class FilterEngine {
+            applyFilters(data, filters) {
+                return data.filter(item => {
+                    // Filtro de busca geral
+                    if (filters.search) {
+                        const searchTerm = filters.search.toLowerCase();
+                        const searchable = [
+                            item.unidade, item.enfermeiro, item.gerente,
+                            item.endereco, item.telefone, item.email,
                             item.territorio
-                        ].join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        ].join(' ').toLowerCase();
                         
-                        if (!searchableFields.includes(searchTerm)) {
-                            return false;
-                        }
+                        if (!searchable.includes(searchTerm)) return false;
                     }
 
-                    // Filtros
-                    if (filters.territorio && item.territorio !== filters.territorio) {
-                        return false;
+                    // Filtro rápido
+                    if (filters.quick) {
+                        const [type, value] = filters.quick.split(':');
+                        if (type === 'vacina' && !item.sala_vacina_ativa?.includes(value)) return false;
+                        if (type === 'tipo' && !item.unidade?.includes(value)) return false;
+                        if (type === 'territorio' && item.territorio !== value) return false;
                     }
 
-                    if (filters.tipo) {
-                        const unitType = item.unidade ? item.unidade.split(' ')[0] : '';
-                        if (unitType !== filters.tipo) {
-                            return false;
-                        }
-                    }
-
-                    if (filters.vacina) {
-                        if (filters.vacina === 'Sim' && !item.sala_vacina_ativa?.includes('Sim')) {
-                            return false;
-                        }
-                        if (filters.vacina === 'Não' && item.sala_vacina_ativa?.includes('Sim')) {
-                            return false;
-                        }
-                    }
+                    // Filtros individuais
+                    if (filters.territorio && item.territorio !== filters.territorio) return false;
+                    if (filters.tipo && !item.unidade?.includes(filters.tipo)) return false;
+                    
+                    if (filters.vacina === 'Sim' && !item.sala_vacina_ativa?.includes('Sim')) return false;
+                    if (filters.vacina === 'Não' && item.sala_vacina_ativa?.includes('Sim')) return false;
+                    
+                    if (filters.equipe === 'medico' && !item.medico) return false;
+                    if (filters.equipe === 'odonto' && !item.odonto) return false;
+                    if (filters.equipe === 'multi' && !item.multi) return false;
 
                     return true;
                 });
             }
 
-            sort(data, field, direction) {
+            sortData(data, field, direction) {
                 return [...data].sort((a, b) => {
-                    let aValue = a[field] || '';
-                    let bValue = b[field] || '';
+                    let aVal = a[field] || '';
+                    let bVal = b[field] || '';
                     
-                    if (typeof aValue === 'string') {
-                        aValue = aValue.toLowerCase();
-                        bValue = bValue.toLowerCase();
+                    if (typeof aVal === 'string') {
+                        aVal = aVal.toLowerCase();
+                        bVal = bVal.toLowerCase();
                     }
                     
                     if (direction === 'asc') {
-                        return aValue > bValue ? 1 : -1;
+                        return aVal > bVal ? 1 : -1;
                     } else {
-                        return aValue < bValue ? 1 : -1;
+                        return aVal < bVal ? 1 : -1;
                     }
                 });
             }
         }
 
-        // Renderizador da tabela
-        class TableRenderer {
-            constructor() {
-                this.searchEngine = new SearchEngine([]);
+        // Renderizador
+        class Renderer {
+            renderResults(data) {
+                if (data.length === 0) {
+                    this.showNoResults();
+                    return;
+                }
+
+                if (appState.currentView === 'cards') {
+                    this.renderCards(data);
+                } else {
+                    this.renderTable(data);
+                }
+            }
+
+            renderCards(data) {
+                elements.cardsView.innerHTML = '';
+                elements.tableView.classList.add('hidden');
+                elements.cardsView.classList.remove('hidden');
+                
+                data.forEach(unit => {
+                    const card = this.createCard(unit);
+                    elements.cardsView.appendChild(card);
+                });
+            }
+
+            createCard(unit) {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-sm p-5 card-hover contact-card border-l-4 border-blue-500';
+                card.style.borderLeftColor = this.getTerritoryColor(unit.territorio);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-gray-800 text-lg leading-tight">${unit.unidade || 'Unidade'}</h3>
+                        <span class="text-xs font-medium px-2 py-1 rounded-full ${unit.sala_vacina_ativa?.includes('Sim') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${unit.sala_vacina_ativa?.includes('Sim') ? 'Vacina ✓' : 'Sem Vacina'}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        ${unit.enfermeiro ? `
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-user-nurse mr-2 w-4 text-blue-500"></i>
+                                <span class="truncate">${this.formatName(unit.enfermeiro)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${unit.gerente ? `
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-user-tie mr-2 w-4 text-green-500"></i>
+                                <span>${unit.gerente}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${unit.territorio ? `
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-map-marker-alt mr-2 w-4 text-purple-500"></i>
+                                <span>${unit.territorio}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="border-t pt-3">
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                ${unit.telefone ? `
+                                    <button onclick="event.stopPropagation(); app.openContact('phone', '${unit.telefone}')" 
+                                            class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50 transition-colors"
+                                            title="Ligar">
+                                        <i class="fas fa-phone text-sm"></i>
+                                    </button>
+                                    <button onclick="event.stopPropagation(); app.openContact('whatsapp', '${unit.telefone}')" 
+                                            class="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50 transition-colors"
+                                            title="WhatsApp">
+                                        <i class="fab fa-whatsapp text-sm"></i>
+                                    </button>
+                                ` : ''}
+                                
+                                ${unit.email ? `
+                                    <button onclick="event.stopPropagation(); app.openContact('email', '${unit.email}')" 
+                                            class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                            title="Email">
+                                        <i class="fas fa-envelope text-sm"></i>
+                                    </button>
+                                ` : ''}
+                                
+                                ${unit.endereco ? `
+                                    <button onclick="event.stopPropagation(); app.openContact('maps', '${unit.endereco}')" 
+                                            class="text-purple-600 hover:text-purple-800 p-2 rounded-full hover:bg-purple-50 transition-colors"
+                                            title="Ver no Maps">
+                                        <i class="fas fa-map-marker-alt text-sm"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                            
+                            <button onclick="app.showUnitDetails(${JSON.stringify(unit).replace(/"/g, '&quot;')})"
+                                    class="text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center">
+                                Detalhes <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => this.showUnitDetails(unit));
+                return card;
             }
 
             renderTable(data) {
-                elements.tableBody.innerHTML = '';
+                elements.tableView.classList.remove('hidden');
+                elements.cardsView.classList.add('hidden');
                 
-                if (data.length === 0) {
-                    elements.loadingIndicator.classList.add('hidden');
-                    elements.noResults.classList.remove('hidden');
-                    return;
-                }
-                
-                elements.noResults.classList.add('hidden');
-                
-                const sortedData = this.searchEngine.sort(data, appState.currentSort.field, appState.currentSort.direction);
-                
-                sortedData.forEach((unit, index) => {
-                    const row = this.createTableRow(unit, index);
-                    elements.tableBody.appendChild(row);
-                });
-                
-                this.updateSortIcons();
+                elements.tableBody.innerHTML = data.map(unit => `
+                    <tr class="hover:bg-gray-50 border-b border-gray-100">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900">${unit.unidade || '-'}</div>
+                            ${unit.territorio ? `<div class="text-sm text-gray-500">${unit.territorio}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">${this.formatName(unit.enfermeiro) || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-3">
+                                ${unit.telefone ? `
+                                    <button onclick="app.openContact('phone', '${unit.telefone}')" 
+                                            class="text-blue-600 hover:text-blue-800 transition-colors"
+                                            title="Ligar">
+                                        <i class="fas fa-phone"></i>
+                                    </button>
+                                    <button onclick="app.openContact('whatsapp', '${unit.telefone}')" 
+                                            class="text-green-600 hover:text-green-800 transition-colors"
+                                            title="WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
+                                ` : ''}
+                                ${unit.email ? `
+                                    <button onclick="app.openContact('email', '${unit.email}')" 
+                                            class="text-red-600 hover:text-red-800 transition-colors"
+                                            title="Email">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                ` : ''}
+                                ${unit.endereco ? `
+                                    <button onclick="app.openContact('maps', '${unit.endereco}')" 
+                                            class="text-purple-600 hover:text-purple-800 transition-colors"
+                                            title="Maps">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full ${unit.sala_vacina_ativa?.includes('Sim') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${unit.sala_vacina_ativa || 'Não'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">${unit.territorio || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button onclick="app.showUnitDetails(${JSON.stringify(unit).replace(/"/g, '&quot;')})"
+                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Ver <i class="fas fa-external-link-alt ml-1"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
             }
 
-            createTableRow(unit, index) {
-                const row = document.createElement('tr');
-                row.className = `hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`;
-                row.addEventListener('click', () => this.showUnitDetails(unit));
-                
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">${unit.unidade || '-'}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${this.formatEnfermeiro(unit.enfermeiro)}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${unit.gerente || '-'}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex space-x-2">
-                            ${unit.telefone ? `
-                                <a href="tel:${this.cleanPhone(unit.telefone)}" 
-                                   class="text-blue-600 hover:text-blue-800 transition-colors"
-                                   onclick="event.stopPropagation()">
-                                    <i class="fas fa-phone"></i>
-                                </a>
-                                <a href="https://wa.me/55${this.cleanPhone(unit.telefone)}" 
-                                   class="text-green-600 hover:text-green-800 transition-colors"
-                                   onclick="event.stopPropagation()">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                            ` : ''}
-                            ${unit.email ? `
-                                <a href="mailto:${unit.email}" 
-                                   class="text-red-600 hover:text-red-800 transition-colors"
-                                   onclick="event.stopPropagation()">
-                                    <i class="fas fa-envelope"></i>
-                                </a>
-                            ` : ''}
-                            ${unit.endereco ? `
-                                <a href="https://maps.google.com/?q=${encodeURIComponent(unit.endereco + ', Passo Fundo, RS')}" 
-                                   target="_blank"
-                                   class="text-purple-600 hover:text-purple-800 transition-colors"
-                                   onclick="event.stopPropagation()">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </a>
-                            ` : ''}
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${unit.sala_vacina_ativa?.includes('Sim') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                            ${unit.sala_vacina_ativa || 'Não'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${unit.territorio || '-'}</div>
-                    </td>
-                `;
-                
-                return row;
+            showNoResults() {
+                elements.cardsView.classList.add('hidden');
+                elements.tableView.classList.add('hidden');
+                elements.noResults.classList.remove('hidden');
             }
 
-            formatEnfermeiro(enfermeiro) {
-                if (!enfermeiro) return '-';
-                // Pegar apenas o primeiro nome para simplificar
-                const firstPart = enfermeiro.split('(')[0].split(',')[0].trim();
-                return firstPart.length > 30 ? firstPart.substring(0, 30) + '...' : firstPart;
+            formatName(name) {
+                if (!name) return '';
+                // Pegar primeiro nome para display
+                return name.split('(')[0].split(',')[0].trim();
             }
 
-            cleanPhone(phone) {
-                return phone ? phone.replace(/\D/g, '') : '';
-            }
-
-            updateSortIcons() {
-                document.querySelectorAll('.sortable i').forEach(icon => {
-                    icon.className = 'fas fa-sort ml-1';
-                });
-                
-                const currentSortIcon = document.querySelector(`[data-sort="${appState.currentSort.field}"] i`);
-                if (currentSortIcon) {
-                    currentSortIcon.className = appState.currentSort.direction === 'asc' 
-                        ? 'fas fa-sort-up ml-1' 
-                        : 'fas fa-sort-down ml-1';
-                }
+            getTerritoryColor(territorio) {
+                const colors = {
+                    'UPF': '#3b82f6',
+                    'UFFS': '#10b981', 
+                    'IMED': '#8b5cf6',
+                    'FASURGS': '#f59e0b'
+                };
+                return colors[territorio] || '#6b7280';
             }
 
             showUnitDetails(unit) {
-                elements.modalTitle.textContent = unit.unidade || 'Detalhes da Unidade';
+                elements.modalTitle.textContent = unit.unidade || 'Unidade de Saúde';
+                elements.modalSubtitle.textContent = unit.territorio ? `Território: ${unit.territorio}` : '';
                 
                 let content = `
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <h4 class="font-semibold text-gray-700 mb-2">Informações Principais</h4>
-                                <div class="space-y-2">
-                                    ${unit.enfermeiro ? `<p><strong>Enfermeiro:</strong> ${unit.enfermeiro}</p>` : ''}
-                                    ${unit.gerente ? `<p><strong>Gerente:</strong> ${unit.gerente}</p>` : ''}
-                                    ${unit.territorio ? `<p><strong>Território:</strong> ${unit.territorio}</p>` : ''}
-                                    ${unit.sala_vacina_ativa ? `<p><strong>Sala de Vacina:</strong> ${unit.sala_vacina_ativa}</p>` : ''}
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                                    <i class="fas fa-info-circle mr-2"></i> Informações Principais
+                                </h4>
+                                <div class="space-y-2 text-sm">
+                                    ${unit.enfermeiro ? `<p><strong>Enfermeiro:</strong><br>${unit.enfermeiro}</p>` : ''}
+                                    ${unit.gerente ? `<p><strong>Gerente:</strong><br>${unit.gerente}</p>` : ''}
+                                    ${unit.sala_vacina_ativa ? `<p><strong>Sala de Vacina:</strong><br>${unit.sala_vacina_ativa}</p>` : ''}
                                 </div>
                             </div>
                             
-                            <div>
-                                <h4 class="font-semibold text-gray-700 mb-2">Contatos</h4>
-                                <div class="space-y-2">
-                                    ${unit.telefone ? `<p><strong>Telefone:</strong> ${unit.telefone}</p>` : ''}
-                                    ${unit.email ? `<p><strong>Email:</strong> ${unit.email}</p>` : ''}
-                                    ${unit.endereco ? `<p><strong>Endereço:</strong> ${unit.endereco}</p>` : ''}
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-green-800 mb-2 flex items-center">
+                                    <i class="fas fa-users mr-2"></i> Equipe
+                                </h4>
+                                <div class="space-y-1 text-sm">
+                                    ${unit.tecnico_enfermagem ? `<p><strong>Téc. Enfermagem:</strong><br>${unit.tecnico_enfermagem}</p>` : ''}
+                                    ${unit.medico ? `<p><strong>Médico:</strong><br>${unit.medico}</p>` : ''}
+                                    ${unit.odonto ? `<p><strong>Odonto:</strong><br>${unit.odonto}</p>` : ''}
+                                    ${unit.multi ? `<p><strong>Multiprofissional:</strong><br>${unit.multi}</p>` : ''}
                                 </div>
                             </div>
                         </div>
-                `;
-                
-                // Adicionar equipe se disponível
-                const teamMembers = [];
-                if (unit.tecnico_enfermagem) teamMembers.push(`<strong>Téc. Enfermagem:</strong> ${unit.tecnico_enfermagem}`);
-                if (unit.medico) teamMembers.push(`<strong>Médico:</strong> ${unit.medico}`);
-                if (unit.odonto) teamMembers.push(`<strong>Odonto:</strong> ${unit.odonto}`);
-                if (unit.multi) teamMembers.push(`<strong>Multiprofissional:</strong> ${unit.multi}`);
-                
-                if (teamMembers.length > 0) {
-                    content += `
-                        <div>
-                            <h4 class="font-semibold text-gray-700 mb-2">Equipe</h4>
-                            <div class="space-y-1">
-                                ${teamMembers.join('<br>')}
+                        
+                        <div class="space-y-4">
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-purple-800 mb-2 flex items-center">
+                                    <i class="fas fa-address-book mr-2"></i> Contatos
+                                </h4>
+                                <div class="space-y-3">
+                                    ${unit.telefone ? `
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm"><strong>Telefone:</strong><br>${unit.telefone}</span>
+                                            <div class="flex space-x-1">
+                                                <button onclick="app.openContact('phone', '${unit.telefone}')" 
+                                                        class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-colors">
+                                                    <i class="fas fa-phone text-sm"></i>
+                                                </button>
+                                                <button onclick="app.openContact('whatsapp', '${unit.telefone}')" 
+                                                        class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors">
+                                                    <i class="fab fa-whatsapp text-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${unit.email ? `
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm"><strong>Email:</strong><br>${unit.email}</span>
+                                            <button onclick="app.openContact('email', '${unit.email}')" 
+                                                    class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors">
+                                                <i class="fas fa-envelope text-sm"></i>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${unit.endereco ? `
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm"><strong>Endereço:</strong><br>${unit.endereco}</span>
+                                            <button onclick="app.openContact('maps', '${unit.endereco}')" 
+                                                    class="bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full transition-colors">
+                                                <i class="fas fa-map-marker-alt text-sm"></i>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
+                            
+                            ${unit.atividades ? `
+                                <div class="bg-orange-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-orange-800 mb-2 flex items-center">
+                                        <i class="fas fa-tasks mr-2"></i> Atividades
+                                    </h4>
+                                    <p class="text-sm">${unit.atividades}</p>
+                                </div>
+                            ` : ''}
                         </div>
-                    `;
-                }
-                
-                // Botões de ação
-                content += `
-                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
-                        ${unit.telefone ? `
-                            <a href="tel:${this.cleanPhone(unit.telefone)}" 
-                               class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-phone mr-2"></i> Ligar
-                            </a>
-                            <a href="https://wa.me/55${this.cleanPhone(unit.telefone)}" 
-                               target="_blank"
-                               class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                <i class="fab fa-whatsapp mr-2"></i> WhatsApp
-                            </a>
-                        ` : ''}
-                        ${unit.email ? `
-                            <a href="mailto:${unit.email}" 
-                               class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-envelope mr-2"></i> Email
-                            </a>
-                        ` : ''}
-                        ${unit.endereco ? `
-                            <a href="https://maps.google.com/?q=${encodeURIComponent(unit.endereco + ', Passo Fundo, RS')}" 
-                               target="_blank"
-                               class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                <i class="fas fa-map-marker-alt mr-2"></i> Ver no Maps
-                            </a>
-                        ` : ''}
                     </div>
-                </div>
                 `;
                 
                 elements.modalContent.innerHTML = content;
@@ -732,236 +1065,33 @@
             }
         }
 
-        // Atualizador de métricas
-        class MetricsUpdater {
-            updateMetrics(data) {
-                const total = data.length;
-                const comVacina = data.filter(unit => unit.sala_vacina_ativa?.includes('Sim')).length;
-                const territorios = new Set(data.map(unit => unit.territorio).filter(Boolean)).size;
-                const esfCount = data.filter(unit => unit.unidade?.includes('ESF')).length;
-                
-                elements.totalUnits.textContent = total;
-                elements.vacinaUnits.textContent = comVacina;
-                elements.territoriosCount.textContent = territorios;
-                elements.esfUnits.textContent = esfCount;
-                elements.resultCount.textContent = total;
-            }
-        }
+        // Instanciar e tornar global para os event listeners
+        const app = new HealthDashboardApp();
 
-        // Exportador PDF
-        class PDFExporter {
-            async exportToPDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Cabeçalho
-                doc.setFontSize(20);
-                doc.setTextColor(40, 40, 40);
-                doc.text('Relatório de Unidades de Saúde - Passo Fundo', 20, 30);
-                
-                // Data
-                doc.setFontSize(12);
-                doc.setTextColor(100, 100, 100);
-                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 45);
-                
-                // Métricas
-                doc.setFontSize(14);
-                doc.setTextColor(60, 60, 60);
-                doc.text('Métricas:', 20, 65);
-                
-                doc.setFontSize(12);
-                let yPos = 75;
-                doc.text(`• Total de Unidades: ${appState.filteredData.length}`, 25, yPos);
-                yPos += 10;
-                doc.text(`• Com Sala de Vacina: ${appState.filteredData.filter(u => u.sala_vacina_ativa?.includes('Sim')).length}`, 25, yPos);
-                yPos += 10;
-                doc.text(`• Territórios: ${new Set(appState.filteredData.map(u => u.territorio).filter(Boolean)).size}`, 25, yPos);
-                
-                // Lista de unidades
-                yPos += 20;
-                doc.setFontSize(14);
-                doc.setTextColor(60, 60, 60);
-                doc.text('Unidades:', 20, yPos);
-                
-                yPos += 10;
-                doc.setFontSize(10);
-                
-                appState.filteredData.forEach((unit, index) => {
-                    if (yPos > 270) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
-                    
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFont(undefined, 'bold');
-                    doc.text(`${index + 1}. ${unit.unidade || 'N/A'}`, 25, yPos);
-                    
-                    doc.setFont(undefined, 'normal');
-                    yPos += 6;
-                    doc.setTextColor(80, 80, 80);
-                    
-                    if (unit.enfermeiro) {
-                        doc.text(`   Enfermeiro: ${unit.enfermeiro}`, 25, yPos);
-                        yPos += 5;
-                    }
-                    
-                    if (unit.telefone) {
-                        doc.text(`   Telefone: ${unit.telefone}`, 25, yPos);
-                        yPos += 5;
-                    }
-                    
-                    yPos += 4;
-                });
-                
-                doc.save(`unidades-saude-passo-fundo-${new Date().toISOString().split('T')[0]}.pdf`);
-            }
-        }
-
-        // Aplicação principal
-        class HealthDashboardApp {
-            constructor() {
-                this.dataManager = new DataManager();
-                this.tableRenderer = new TableRenderer();
-                this.metricsUpdater = new MetricsUpdater();
-                this.pdfExporter = new PDFExporter();
-                this.init();
-            }
-
-            async init() {
-                this.setupEventListeners();
-                await this.loadData();
-                this.updateLastUpdateTime();
-            }
-
-            async loadData() {
-                elements.loadingIndicator.classList.remove('hidden');
-                
-                try {
-                    const data = await this.dataManager.fetchData();
-                    appState.allData = data;
-                    this.applyFilters();
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                    this.showError('Erro ao carregar dados. Verifique sua conexão.');
-                } finally {
-                    elements.loadingIndicator.classList.add('hidden');
+        // Métodos globais para os event listeners
+        window.app = {
+            showUnitDetails: (unit) => {
+                const renderer = new Renderer();
+                renderer.showUnitDetails(unit);
+            },
+            
+            openContact: (type, value) => {
+                switch (type) {
+                    case 'phone':
+                        window.open(`tel:${value.replace(/\D/g, '')}`, '_self');
+                        break;
+                    case 'whatsapp':
+                        window.open(`https://wa.me/55${value.replace(/\D/g, '')}`, '_blank');
+                        break;
+                    case 'email':
+                        window.open(`mailto:${value}`, '_blank');
+                        break;
+                    case 'maps':
+                        window.open(`https://maps.google.com/?q=${encodeURIComponent(value + ', Passo Fundo, RS')}`, '_blank');
+                        break;
                 }
             }
-
-            applyFilters() {
-                const searchTerm = elements.searchInput.value;
-                const territorio = elements.territorioFilter.value;
-                const tipo = elements.tipoFilter.value;
-                const vacina = elements.vacinaFilter.value;
-                
-                appState.filters = { search: searchTerm, territorio, tipo, vacina };
-                
-                this.tableRenderer.searchEngine = new SearchEngine(appState.allData);
-                appState.filteredData = this.tableRenderer.searchEngine.search(searchTerm, { territorio, tipo, vacina });
-                
-                this.tableRenderer.renderTable(appState.filteredData);
-                this.metricsUpdater.updateMetrics(appState.filteredData);
-            }
-
-            sortTable(field) {
-                if (appState.currentSort.field === field) {
-                    appState.currentSort.direction = appState.currentSort.direction === 'asc' ? 'desc' : 'asc';
-                } else {
-                    appState.currentSort = { field, direction: 'asc' };
-                }
-                
-                this.tableRenderer.renderTable(appState.filteredData);
-            }
-
-            setupEventListeners() {
-                // Busca em tempo real
-                elements.searchInput.addEventListener('input', () => {
-                    this.applyFilters();
-                });
-
-                // Filtros
-                elements.territorioFilter.addEventListener('change', () => {
-                    this.applyFilters();
-                });
-
-                elements.tipoFilter.addEventListener('change', () => {
-                    this.applyFilters();
-                });
-
-                elements.vacinaFilter.addEventListener('change', () => {
-                    this.applyFilters();
-                });
-
-                // Limpar filtros
-                elements.clearFilters.addEventListener('click', () => {
-                    elements.searchInput.value = '';
-                    elements.territorioFilter.value = '';
-                    elements.tipoFilter.value = '';
-                    elements.vacinaFilter.value = '';
-                    this.applyFilters();
-                });
-
-                // Ordenação
-                document.querySelectorAll('.sortable').forEach(element => {
-                    element.addEventListener('click', (e) => {
-                        const field = e.currentTarget.getAttribute('data-sort');
-                        this.sortTable(field);
-                    });
-                });
-
-                // Atualizar dados
-                elements.refreshBtn.addEventListener('click', async () => {
-                    // Limpar cache para forçar atualização
-                    localStorage.removeItem('saude-pf-data');
-                    localStorage.removeItem('saude-pf-last-update');
-                    await this.loadData();
-                });
-
-                // Exportar PDF
-                elements.exportBtn.addEventListener('click', () => {
-                    this.pdfExporter.exportToPDF();
-                });
-
-                // Modal
-                elements.closeModal.addEventListener('click', () => {
-                    elements.unitModal.classList.add('hidden');
-                });
-
-                elements.unitModal.addEventListener('click', (e) => {
-                    if (e.target === elements.unitModal) {
-                        elements.unitModal.classList.add('hidden');
-                    }
-                });
-
-                // Tecla ESC para fechar modal
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && !elements.unitModal.classList.contains('hidden')) {
-                        elements.unitModal.classList.add('hidden');
-                    }
-                });
-            }
-
-            updateLastUpdateTime() {
-                try {
-                    const timestamp = localStorage.getItem('saude-pf-last-update');
-                    if (timestamp) {
-                        elements.lastUpdate.textContent = new Date(parseInt(timestamp)).toLocaleString('pt-BR');
-                    }
-                } catch (e) {
-                    console.warn('Erro ao cargar timestamp:', e);
-                }
-            }
-
-            showError(message) {
-                // Implementar notificação de erro se necessário
-                console.error(message);
-            }
-        }
-
-        // Inicializar a aplicação quando o DOM estiver carregado
-        document.addEventListener('DOMContentLoaded', () => {
-            new HealthDashboardApp();
-        });
+        };
     </script>
 </body>
 </html>
