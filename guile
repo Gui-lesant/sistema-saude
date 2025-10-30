@@ -3,32 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Unidades de Saúde</title>
+    <title>Sistema Unidades de Saúde - Tabela Dinâmica</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Todo o CSS anterior funciona aqui */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
             --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
             --whatsapp: #25D366;
             --maps: #4285F4;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
             padding: 20px;
+            color: #333;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         
@@ -39,10 +47,15 @@
             text-align: center;
         }
         
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
         .controls {
             padding: 1.5rem;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            background: var(--light);
+            border-bottom: 1px solid #ddd;
         }
         
         .search-box {
@@ -51,28 +64,72 @@
         
         .search-box input {
             width: 100%;
-            padding: 12px 20px;
+            padding: 15px 25px;
             border: 2px solid #ddd;
             border-radius: 25px;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+        }
+        
+        .stat-card {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .table-container {
+            overflow-x: auto;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1000px;
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         th {
             background: var(--primary);
             color: white;
+            font-weight: 600;
             position: sticky;
             top: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th:hover {
+            background: #34495e;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
         }
         
         .btn {
@@ -86,11 +143,75 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.3s;
+            margin: 2px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .btn-whatsapp { background: var(--whatsapp); }
         .btn-maps { background: var(--maps); }
         .btn-call { background: var(--success); }
+        .btn-email { background: var(--warning); }
+        .btn-primary { 
+            background: var(--secondary); 
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .contact-actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .contact-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -102,29 +223,50 @@
         
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Pesquisar unidades, gerentes, telefones...">
+                <input type="text" id="searchInput" placeholder="🔍 Pesquisar unidades, gerentes, enfermeiros, telefones, endereços...">
             </div>
-            <div>
-                <button onclick="carregarDados()" class="btn" style="background: var(--secondary);">
-                    <i class="fas fa-sync"></i> Carregar Dados
+            <div style="text-align: center;">
+                <button onclick="carregarDados()" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Carregar Dados da Planilha
                 </button>
             </div>
         </div>
         
-        <div id="loading" style="padding: 2rem; text-align: center;">
-            <div>Clique em "Carregar Dados" para iniciar</div>
+        <div id="stats" class="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUnidades">0</div>
+                <div>Unidades</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="unidadesComTelefone">0</div>
+                <div>Com Telefone</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalContatos">0</div>
+                <div>Contatos</div>
+            </div>
         </div>
         
+        <div id="loading" class="loading">
+            <h3>👆 Clique em "Carregar Dados da Planilha" para iniciar</h3>
+            <p>O sistema irá buscar os dados diretamente da sua planilha do Google Sheets</p>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        
         <div id="tabelaContainer" style="display: none;">
-            <div style="overflow-x: auto;">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Unidade</th>
-                            <th>Gerente</th>
-                            <th>Enfermeiro</th>
-                            <th>Telefone</th>
-                            <th>Endereço</th>
+                            <th onclick="ordenarTabela(0)">Unidade <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(1)">Gerente <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(2)">Enfermeiro <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(3)">Téc. Enfermagem <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(4)">Médico <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(5)">Telefone <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(6)">Endereço <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabela(7)">Sala Vacina <i class="fas fa-sort"></i></th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -135,47 +277,91 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO - SUA PLANILHA DO GOOGLE SHEETS
+        // CONFIGURAÇÃO - ID da sua planilha
         const PLANILHA_ID = '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ';
-        const API_KEY = 'SUA_CHAVE_API_GOOGLE'; // Opcional para planilhas públicas
+        let dadosOriginais = [];
+        let dadosFiltrados = [];
         
         async function carregarDados() {
             try {
                 mostrarLoading(true);
+                document.getElementById('error').style.display = 'none';
                 
-                // URL da planilha pública (formato CSV)
+                console.log('🔄 Iniciando carregamento...');
+                
+                // URL para buscar dados da planilha como CSV
                 const url = `https://docs.google.com/spreadsheets/d/${PLANILHA_ID}/gviz/tq?tqx=out:csv`;
                 
                 const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
                 const csvData = await response.text();
+                console.log('📊 Dados CSV recebidos:', csvData.length, 'caracteres');
                 
                 const dados = parseCSV(csvData);
+                console.log('✅ Dados processados:', dados.length, 'registros');
+                
+                dadosOriginais = dados;
+                dadosFiltrados = [...dados];
+                
+                atualizarEstatisticas(dados);
                 renderizarTabela(dados);
+                mostrarLoading(false);
                 
             } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao carregar dados: ' + error.message);
-            } finally {
+                console.error('❌ Erro detalhado:', error);
+                mostrarErro('Erro ao carregar dados: ' + error.message);
                 mostrarLoading(false);
             }
         }
         
         function parseCSV(csv) {
-            const linhas = csv.split('\n');
-            const cabecalhos = linhas[0].split(',').map(h => h.replace(/"/g, '').trim());
+            const linhas = csv.split('\n').filter(linha => linha.trim());
+            
+            if (linhas.length === 0) return [];
+            
+            // Detecta cabeçalhos
+            const cabecalhos = linhas[0].split(',').map(h => 
+                h.replace(/^"|"$/g, '').trim().toUpperCase()
+            );
+            
+            console.log('📋 Cabeçalhos detectados:', cabecalhos);
             
             const dados = [];
+            
             for (let i = 1; i < linhas.length; i++) {
-                if (!linhas[i].trim()) continue;
+                const linha = linhas[i];
+                if (!linha.trim()) continue;
                 
-                const valores = linhas[i].split(',').map(v => v.replace(/"/g, '').trim());
-                const linha = {};
+                // Processa CSV considerando aspas
+                const valores = [];
+                let dentroDeAspas = false;
+                let valorAtual = '';
                 
+                for (let char of linha) {
+                    if (char === '"') {
+                        dentroDeAspas = !dentroDeAspas;
+                    } else if (char === ',' && !dentroDeAspas) {
+                        valores.push(valorAtual.trim());
+                        valorAtual = '';
+                    } else {
+                        valorAtual += char;
+                    }
+                }
+                valores.push(valorAtual.trim());
+                
+                const registro = {};
                 cabecalhos.forEach((cabecalho, index) => {
-                    linha[cabecalho] = valores[index] || '';
+                    registro[cabecalho] = (valores[index] || '').replace(/^"|"$/g, '');
                 });
                 
-                dados.push(linha);
+                // Só adiciona se tiver pelo menos um dado
+                if (Object.values(registro).some(valor => valor && valor !== '""')) {
+                    dados.push(registro);
+                }
             }
             
             return dados;
@@ -185,35 +371,83 @@
             const tbody = document.getElementById('tabelaBody');
             
             if (dados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum dado encontrado</td></tr>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 3rem; color: #666;">
+                            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <div>Nenhum dado encontrado na planilha</div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
-            tbody.innerHTML = dados.map(linha => {
-                const telefone = linha.TELEFONE || linha.TEL || '';
-                const endereco = linha.ENDERECO || linha.ENDEREÇO || '';
+            tbody.innerHTML = dados.map(registro => {
+                const unidade = registro.UNIDADE || registro.NOME || 'N/A';
+                const gerente = registro.GERENTE || 'N/A';
+                const enfermeiro = registro.ENFERMEIRO || '0';
+                const tecEnfermagem = registro['TEC. ENFERMAGEM'] || registro.TEC_ENFERMAGEM || '0';
+                const medico = registro.MEDICO || '0';
+                const telefone = registro.TELEFONE || registro.TEL || '';
+                const endereco = registro.ENDERECO || registro.ENDEREÇO || '';
+                const salaVacina = registro['SALA DE VACINA ATIVA'] || registro.SALA_VACINA || '';
+                const email = registro.EMAIL || '';
+                
+                const temWhatsapp = telefone && telefone.replace(/\D/g, '').length >= 10;
+                const temMaps = endereco && endereco.length > 5;
+                const temTelefone = telefone && telefone.length > 5;
+                const temEmail = email && email.includes('@');
                 
                 return `
                     <tr>
-                        <td><strong>${linha.UNIDADE || 'N/A'}</strong></td>
-                        <td>${linha.GERENTE || 'N/A'}</td>
-                        <td>${linha.ENFERMEIRO || '0'}</td>
+                        <td><strong>${escapeHTML(unidade)}</strong></td>
+                        <td>${escapeHTML(gerente)}</td>
+                        <td>${enfermeiro}</td>
+                        <td>${tecEnfermagem}</td>
+                        <td>${medico}</td>
                         <td>${formatarTelefone(telefone)}</td>
-                        <td>${endereco}</td>
+                        <td>${escapeHTML(endereco)}</td>
                         <td>
-                            ${telefone ? `
-                                <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" target="_blank" class="btn btn-whatsapp">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </a>
-                                <a href="tel:${telefone}" class="btn btn-call">
-                                    <i class="fas fa-phone"></i> Ligar
-                                </a>
-                            ` : ''}
-                            ${endereco ? `
-                                <a href="https://maps.google.com/?q=${encodeURIComponent(endereco)}" target="_blank" class="btn btn-maps">
-                                    <i class="fas fa-map-marker-alt"></i> Maps
-                                </a>
-                            ` : ''}
+                            <span class="badge ${salaVacina.toUpperCase() === 'SIM' ? 'badge-success' : 'badge-danger'}">
+                                ${salaVacina || 'N/A'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="contact-actions">
+                                ${temWhatsapp ? `
+                                    <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" 
+                                       target="_blank" 
+                                       class="btn btn-whatsapp"
+                                       title="WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                ` : ''}
+                                
+                                ${temMaps ? `
+                                    <a href="https://maps.google.com/?q=${encodeURIComponent(endereco)}" 
+                                       target="_blank" 
+                                       class="btn btn-maps"
+                                       title="Google Maps">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </a>
+                                ` : ''}
+                                
+                                ${temTelefone ? `
+                                    <a href="tel:${telefone}" 
+                                       class="btn btn-call"
+                                       title="Ligar">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                ` : ''}
+                                
+                                ${temEmail ? `
+                                    <a href="mailto:${email}" 
+                                       class="btn btn-email"
+                                       title="Email">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                ` : ''}
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -222,29 +456,87 @@
             document.getElementById('tabelaContainer').style.display = 'block';
         }
         
+        function atualizarEstatisticas(dados) {
+            const totalUnidades = dados.length;
+            const unidadesComTelefone = dados.filter(d => d.TELEFONE || d.TEL).length;
+            const totalContatos = dados.filter(d => d.TELEFONE || d.EMAIL).length;
+            
+            document.getElementById('totalUnidades').textContent = totalUnidades;
+            document.getElementById('unidadesComTelefone').textContent = unidadesComTelefone;
+            document.getElementById('totalContatos').textContent = totalContatos;
+            document.getElementById('stats').style.display = 'grid';
+        }
+        
         function formatarTelefone(telefone) {
             if (!telefone) return 'N/A';
             const numeros = telefone.replace(/\D/g, '');
             if (numeros.length === 11) {
                 return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (numeros.length === 10) {
+                return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
             }
             return telefone;
         }
         
+        function escapeHTML(texto) {
+            if (!texto) return 'N/A';
+            return texto.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        
         function mostrarLoading(mostrar) {
             document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+            if (!mostrar) {
+                document.getElementById('loading').innerHTML = `
+                    <div>Clique em "Carregar Dados" para atualizar</div>
+                `;
+            }
+        }
+        
+        function mostrarErro(mensagem) {
+            document.getElementById('error').textContent = mensagem;
+            document.getElementById('error').style.display = 'block';
+        }
+        
+        function ordenarTabela(colIndex) {
+            // Implementação simples de ordenação
+            const tbody = document.getElementById('tabelaBody');
+            const linhas = Array.from(tbody.querySelectorAll('tr'));
+            
+            linhas.sort((a, b) => {
+                const aVal = a.cells[colIndex].textContent;
+                const bVal = b.cells[colIndex].textContent;
+                return aVal.localeCompare(bVal, undefined, { numeric: true });
+            });
+            
+            tbody.innerHTML = '';
+            linhas.forEach(linha => tbody.appendChild(linha));
         }
         
         // Busca em tempo real
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const termo = e.target.value.toLowerCase();
-            const linhas = document.querySelectorAll('#tabelaBody tr');
             
-            linhas.forEach(linha => {
-                const texto = linha.textContent.toLowerCase();
-                linha.style.display = texto.includes(termo) ? '' : 'none';
-            });
+            if (termo === '') {
+                dadosFiltrados = [...dadosOriginais];
+            } else {
+                dadosFiltrados = dadosOriginais.filter(registro => 
+                    Object.values(registro).some(valor => 
+                        valor && valor.toString().toLowerCase().includes(termo)
+                    )
+                );
+            }
+            
+            atualizarEstatisticas(dadosFiltrados);
+            renderizarTabela(dadosFiltrados);
         });
+        
+        // Carregar dados automaticamente se a planilha for pública
+        // window.addEventListener('load', carregarDados);
     </script>
 </body>
 </html>
