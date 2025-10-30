@@ -3,32 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Unidades de Saúde - Tabela Dinâmica</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Sistema Unidades de Saúde - Versão Local</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --whatsapp: #25D366;
-            --maps: #4285F4;
-            --light: #ecf0f1;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --primary: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --whatsapp: #25d366;
+            --maps: #4285f4;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
-            color: #333;
         }
         
         .container {
@@ -47,15 +39,10 @@
             text-align: center;
         }
         
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
         .controls {
             padding: 1.5rem;
-            background: var(--light);
-            border-bottom: 1px solid #ddd;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
         }
         
         .search-box {
@@ -67,150 +54,79 @@
             padding: 15px 25px;
             border: 2px solid #ddd;
             border-radius: 25px;
-            font-size: 1.1rem;
-            transition: all 0.3s;
+            font-size: 1rem;
         }
         
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            padding: 1.5rem;
-            background: white;
-        }
-        
-        .stat-card {
-            background: var(--light);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .table-container {
-            overflow-x: auto;
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1000px;
         }
         
         th, td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #ddd;
         }
         
         th {
-            background: var(--primary);
-            color: white;
+            background: #f8f9fa;
             font-weight: 600;
             position: sticky;
             top: 0;
-            cursor: pointer;
-            user-select: none;
         }
         
-        th:hover {
-            background: #34495e;
-        }
-        
-        tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .btn {
+        .action-btn {
             padding: 8px 15px;
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            text-decoration: none;
             color: white;
             font-size: 0.8rem;
+            margin: 2px;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            transition: all 0.3s;
-            margin: 2px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .btn-whatsapp { background: var(--whatsapp); }
         .btn-maps { background: var(--maps); }
         .btn-call { background: var(--success); }
-        .btn-email { background: var(--warning); }
-        .btn-primary { 
-            background: var(--secondary); 
-            padding: 12px 25px;
-            font-size: 1rem;
-        }
         
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        
-        .badge-success { background: #d4edda; color: #155724; }
-        .badge-danger { background: #f8d7da; color: #721c24; }
-        
-        .loading {
-            text-align: center;
-            padding: 3rem;
+        .loading { 
+            padding: 3rem; 
+            text-align: center; 
             color: #666;
+            font-size: 1.1rem;
         }
         
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 1rem;
-            margin: 1rem;
+        .error { 
+            background: #fee2e2; 
+            color: #dc2626; 
+            padding: 1.5rem; 
+            margin: 1rem; 
             border-radius: 10px;
             text-align: center;
         }
         
-        .contact-actions {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .contact-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                justify-content: center;
-            }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -218,55 +134,42 @@
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-hospital"></i> Sistema Unidades de Saúde</h1>
-            <p>Tabela Dinâmica com Contatos - Versão Independente</p>
+            <p>Gestão de unidades e contatos - Versão Otimizada</p>
         </div>
         
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Pesquisar unidades, gerentes, enfermeiros, telefones, endereços...">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar unidades, gerentes, telefones, endereços...">
             </div>
             <div style="text-align: center;">
-                <button onclick="carregarDados()" class="btn btn-primary">
+                <button class="btn" onclick="carregarDados()">
                     <i class="fas fa-sync"></i> Carregar Dados da Planilha
                 </button>
             </div>
         </div>
         
-        <div id="stats" class="stats" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-number" id="totalUnidades">0</div>
-                <div>Unidades</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="unidadesComTelefone">0</div>
-                <div>Com Telefone</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalContatos">0</div>
-                <div>Contatos</div>
-            </div>
-        </div>
-        
         <div id="loading" class="loading">
-            <h3>👆 Clique em "Carregar Dados da Planilha" para iniciar</h3>
-            <p>O sistema irá buscar os dados diretamente da sua planilha do Google Sheets</p>
+            <h3>🚀 Sistema Pronto</h3>
+            <p>Clique no botão acima para carregar os dados da planilha</p>
+            <p><small>Se aparecer erro de CORS, use um servidor local simples</small></p>
         </div>
         
         <div id="error" class="error" style="display: none;"></div>
+        <div id="success" class="success" style="display: none;"></div>
         
         <div id="tabelaContainer" style="display: none;">
-            <div class="table-container">
+            <div style="overflow-x: auto;">
                 <table>
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabela(0)">Unidade <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(1)">Gerente <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(2)">Enfermeiro <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(3)">Téc. Enfermagem <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(4)">Médico <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(5)">Telefone <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(6)">Endereço <i class="fas fa-sort"></i></th>
-                            <th onclick="ordenarTabela(7)">Sala Vacina <i class="fas fa-sort"></i></th>
+                            <th>Unidade</th>
+                            <th>Gerente</th>
+                            <th>Enfermeiro</th>
+                            <th>Téc. Enfermagem</th>
+                            <th>Médico</th>
+                            <th>Telefone</th>
+                            <th>Endereço</th>
+                            <th>Sala Vacina</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -277,89 +180,159 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO - ID da sua planilha
         const PLANILHA_ID = '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ';
         let dadosOriginais = [];
         let dadosFiltrados = [];
         
         async function carregarDados() {
             try {
-                mostrarLoading(true);
+                mostrarLoading('🌐 Conectando com a planilha...');
                 document.getElementById('error').style.display = 'none';
                 
-                console.log('🔄 Iniciando carregamento...');
+                // URL alternativa que funciona melhor com CORS
+                const url = `https://docs.google.com/spreadsheets/d/${PLANILHA_ID}/export?format=csv`;
                 
-                // URL para buscar dados da planilha como CSV
-                const url = `https://docs.google.com/spreadsheets/d/${PLANILHA_ID}/gviz/tq?tqx=out:csv`;
+                console.log('📡 Tentando acessar:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'text/csv'
+                    }
+                });
+                
+                if (!response.ok) {
+                    // Tentar método alternativo
+                    await tentarMetodoAlternativo();
+                    return;
+                }
+                
+                const csv = await response.text();
+                processarDados(csv);
+                
+            } catch (error) {
+                console.error('❌ Erro principal:', error);
+                await tentarMetodoAlternativo();
+            }
+        }
+        
+        async function tentarMetodoAlternativo() {
+            try {
+                mostrarLoading('🔄 Tentando método alternativo...');
+                
+                // Método alternativo usando JSON
+                const url = `https://spreadsheets.google.com/feeds/cells/${PLANILHA_ID}/1/public/full?alt=json`;
                 
                 const response = await fetch(url);
                 
                 if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status}`);
+                    throw new Error(`Não foi possível acessar a planilha. Verifique se ela está pública.`);
                 }
                 
-                const csvData = await response.text();
-                console.log('📊 Dados CSV recebidos:', csvData.length, 'caracteres');
+                const data = await response.json();
+                const csv = converterJSONparaCSV(data);
+                processarDados(csv);
                 
-                const dados = parseCSV(csvData);
-                console.log('✅ Dados processados:', dados.length, 'registros');
+            } catch (error) {
+                console.error('❌ Erro método alternativo:', error);
+                mostrarErro(`
+                    <h3>🔒 Erro de Acesso</h3>
+                    <p><strong>Problema:</strong> ${error.message}</p>
+                    <p><strong>Soluções:</strong></p>
+                    <ol>
+                        <li>Verifique se a planilha está pública (Compartilhar → Qualquer um com o link pode visualizar)</li>
+                        <li>Use um servidor local simples:
+                            <br><code>python -m http.server 8000</code>
+                            <br>Depois acesse: <code>http://localhost:8000</code>
+                        </li>
+                        <li>Hospede no GitHub Pages (recomendado)</li>
+                    </ol>
+                `);
+            }
+        }
+        
+        function converterJSONparaCSV(data) {
+            // Implementação simplificada para converter JSON do Google Sheets para CSV
+            const entries = data.feed.entry;
+            const maxRow = Math.max(...entries.map(entry => parseInt(entry.gs$cell.row)));
+            const maxCol = Math.max(...entries.map(entry => parseInt(entry.gs$cell.col)));
+            
+            let csv = '';
+            for (let row = 1; row <= maxRow; row++) {
+                const rowData = [];
+                for (let col = 1; col <= maxCol; col++) {
+                    const cell = entries.find(entry => 
+                        parseInt(entry.gs$cell.row) === row && 
+                        parseInt(entry.gs$cell.col) === col
+                    );
+                    rowData.push(cell ? `"${cell.gs$cell.$t}"` : '');
+                }
+                csv += rowData.join(',') + '\n';
+            }
+            return csv;
+        }
+        
+        function processarDados(csv) {
+            try {
+                console.log('📊 Processando CSV:', csv.substring(0, 200) + '...');
+                
+                const dados = parseCSV(csv);
+                
+                if (dados.length === 0) {
+                    throw new Error('Planilha vazia ou formato não reconhecido');
+                }
                 
                 dadosOriginais = dados;
                 dadosFiltrados = [...dados];
                 
-                atualizarEstatisticas(dados);
+                mostrarSucesso(`✅ ${dados.length} unidades carregadas com sucesso!`);
                 renderizarTabela(dados);
+                configurarBusca();
                 mostrarLoading(false);
                 
             } catch (error) {
-                console.error('❌ Erro detalhado:', error);
-                mostrarErro('Erro ao carregar dados: ' + error.message);
+                mostrarErro('Erro ao processar dados: ' + error.message);
                 mostrarLoading(false);
             }
         }
         
         function parseCSV(csv) {
             const linhas = csv.split('\n').filter(linha => linha.trim());
+            if (linhas.length < 2) return [];
             
-            if (linhas.length === 0) return [];
-            
-            // Detecta cabeçalhos
-            const cabecalhos = linhas[0].split(',').map(h => 
-                h.replace(/^"|"$/g, '').trim().toUpperCase()
-            );
+            const cabecalhos = linhas[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+            const dados = [];
             
             console.log('📋 Cabeçalhos detectados:', cabecalhos);
-            
-            const dados = [];
             
             for (let i = 1; i < linhas.length; i++) {
                 const linha = linhas[i];
                 if (!linha.trim()) continue;
                 
-                // Processa CSV considerando aspas
                 const valores = [];
-                let dentroDeAspas = false;
                 let valorAtual = '';
+                let dentroDeAspas = false;
                 
                 for (let char of linha) {
                     if (char === '"') {
                         dentroDeAspas = !dentroDeAspas;
                     } else if (char === ',' && !dentroDeAspas) {
-                        valores.push(valorAtual.trim());
+                        valores.push(valorAtual.replace(/^"|"$/g, ''));
                         valorAtual = '';
                     } else {
                         valorAtual += char;
                     }
                 }
-                valores.push(valorAtual.trim());
+                valores.push(valorAtual.replace(/^"|"$/g, ''));
                 
                 const registro = {};
                 cabecalhos.forEach((cabecalho, index) => {
-                    registro[cabecalho] = (valores[index] || '').replace(/^"|"$/g, '');
+                    registro[cabecalho] = valores[index] || '';
                 });
                 
-                // Só adiciona se tiver pelo menos um dado
-                if (Object.values(registro).some(valor => valor && valor !== '""')) {
+                // Só adiciona se tiver nome da unidade
+                if (registro.UNIDADE && registro.UNIDADE.trim()) {
                     dados.push(registro);
                 }
             }
@@ -371,32 +344,22 @@
             const tbody = document.getElementById('tabelaBody');
             
             if (dados.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="9" style="text-align: center; padding: 3rem; color: #666;">
-                            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Nenhum dado encontrado na planilha</div>
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Nenhum dado encontrado</td></tr>';
                 return;
             }
             
             tbody.innerHTML = dados.map(registro => {
-                const unidade = registro.UNIDADE || registro.NOME || 'N/A';
+                const unidade = registro.UNIDADE || 'N/A';
                 const gerente = registro.GERENTE || 'N/A';
                 const enfermeiro = registro.ENFERMEIRO || '0';
-                const tecEnfermagem = registro['TEC. ENFERMAGEM'] || registro.TEC_ENFERMAGEM || '0';
+                const tecEnfermagem = registro['TEC. ENFERMAGEM'] || '0';
                 const medico = registro.MEDICO || '0';
-                const telefone = registro.TELEFONE || registro.TEL || '';
-                const endereco = registro.ENDERECO || registro.ENDEREÇO || '';
-                const salaVacina = registro['SALA DE VACINA ATIVA'] || registro.SALA_VACINA || '';
-                const email = registro.EMAIL || '';
+                const telefone = registro.TELEFONE || '';
+                const endereco = registro.ENDERECO || registro.ENDEREÇO || 'N/A';
+                const salaVacina = registro['SALA DE VACINA ATIVA'] || '';
                 
                 const temWhatsapp = telefone && telefone.replace(/\D/g, '').length >= 10;
-                const temMaps = endereco && endereco.length > 5;
-                const temTelefone = telefone && telefone.length > 5;
-                const temEmail = email && email.includes('@');
+                const temMaps = endereco && endereco !== 'N/A';
                 
                 return `
                     <tr>
@@ -408,43 +371,36 @@
                         <td>${formatarTelefone(telefone)}</td>
                         <td>${escapeHTML(endereco)}</td>
                         <td>
-                            <span class="badge ${salaVacina.toUpperCase() === 'SIM' ? 'badge-success' : 'badge-danger'}">
+                            <span style="
+                                padding: 4px 8px; 
+                                border-radius: 12px; 
+                                font-size: 0.8rem;
+                                background: ${salaVacina === 'SIM' ? '#d1fae5' : '#fee2e2'};
+                                color: ${salaVacina === 'SIM' ? '#065f46' : '#dc2626'};
+                            ">
                                 ${salaVacina || 'N/A'}
                             </span>
                         </td>
                         <td>
-                            <div class="contact-actions">
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
                                 ${temWhatsapp ? `
                                     <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" 
                                        target="_blank" 
-                                       class="btn btn-whatsapp"
-                                       title="WhatsApp">
-                                        <i class="fab fa-whatsapp"></i>
+                                       class="action-btn btn-whatsapp">
+                                        <i class="fab fa-whatsapp"></i> WhatsApp
                                     </a>
                                 ` : ''}
-                                
                                 ${temMaps ? `
                                     <a href="https://maps.google.com/?q=${encodeURIComponent(endereco)}" 
                                        target="_blank" 
-                                       class="btn btn-maps"
-                                       title="Google Maps">
-                                        <i class="fas fa-map-marker-alt"></i>
+                                       class="action-btn btn-maps">
+                                        <i class="fas fa-map-marker-alt"></i> Maps
                                     </a>
                                 ` : ''}
-                                
-                                ${temTelefone ? `
+                                ${telefone ? `
                                     <a href="tel:${telefone}" 
-                                       class="btn btn-call"
-                                       title="Ligar">
-                                        <i class="fas fa-phone"></i>
-                                    </a>
-                                ` : ''}
-                                
-                                ${temEmail ? `
-                                    <a href="mailto:${email}" 
-                                       class="btn btn-email"
-                                       title="Email">
-                                        <i class="fas fa-envelope"></i>
+                                       class="action-btn btn-call">
+                                        <i class="fas fa-phone"></i> Ligar
                                     </a>
                                 ` : ''}
                             </div>
@@ -456,15 +412,22 @@
             document.getElementById('tabelaContainer').style.display = 'block';
         }
         
-        function atualizarEstatisticas(dados) {
-            const totalUnidades = dados.length;
-            const unidadesComTelefone = dados.filter(d => d.TELEFONE || d.TEL).length;
-            const totalContatos = dados.filter(d => d.TELEFONE || d.EMAIL).length;
-            
-            document.getElementById('totalUnidades').textContent = totalUnidades;
-            document.getElementById('unidadesComTelefone').textContent = unidadesComTelefone;
-            document.getElementById('totalContatos').textContent = totalContatos;
-            document.getElementById('stats').style.display = 'grid';
+        function configurarBusca() {
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const termo = e.target.value.toLowerCase();
+                
+                if (!termo) {
+                    dadosFiltrados = [...dadosOriginais];
+                } else {
+                    dadosFiltrados = dadosOriginais.filter(registro => 
+                        Object.values(registro).some(valor => 
+                            valor && valor.toString().toLowerCase().includes(termo)
+                        )
+                    );
+                }
+                
+                renderizarTabela(dadosFiltrados);
+            });
         }
         
         function formatarTelefone(telefone) {
@@ -472,71 +435,43 @@
             const numeros = telefone.replace(/\D/g, '');
             if (numeros.length === 11) {
                 return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-            } else if (numeros.length === 10) {
-                return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
             }
             return telefone;
         }
         
         function escapeHTML(texto) {
             if (!texto) return 'N/A';
-            return texto.toString()
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            const div = document.createElement('div');
+            div.textContent = texto;
+            return div.innerHTML;
         }
         
-        function mostrarLoading(mostrar) {
-            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
-            if (!mostrar) {
-                document.getElementById('loading').innerHTML = `
-                    <div>Clique em "Carregar Dados" para atualizar</div>
-                `;
+        function mostrarLoading(mensagem) {
+            const loading = document.getElementById('loading');
+            if (mensagem === false) {
+                loading.style.display = 'none';
+            } else {
+                loading.style.display = 'block';
+                loading.innerHTML = `<h3>${mensagem}</h3>`;
             }
         }
         
         function mostrarErro(mensagem) {
-            document.getElementById('error').textContent = mensagem;
+            document.getElementById('error').innerHTML = mensagem;
             document.getElementById('error').style.display = 'block';
+            mostrarLoading(false);
         }
         
-        function ordenarTabela(colIndex) {
-            // Implementação simples de ordenação
-            const tbody = document.getElementById('tabelaBody');
-            const linhas = Array.from(tbody.querySelectorAll('tr'));
-            
-            linhas.sort((a, b) => {
-                const aVal = a.cells[colIndex].textContent;
-                const bVal = b.cells[colIndex].textContent;
-                return aVal.localeCompare(bVal, undefined, { numeric: true });
-            });
-            
-            tbody.innerHTML = '';
-            linhas.forEach(linha => tbody.appendChild(linha));
+        function mostrarSucesso(mensagem) {
+            document.getElementById('success').textContent = mensagem;
+            document.getElementById('success').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('success').style.display = 'none';
+            }, 5000);
         }
         
-        // Busca em tempo real
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const termo = e.target.value.toLowerCase();
-            
-            if (termo === '') {
-                dadosFiltrados = [...dadosOriginais];
-            } else {
-                dadosFiltrados = dadosOriginais.filter(registro => 
-                    Object.values(registro).some(valor => 
-                        valor && valor.toString().toLowerCase().includes(termo)
-                    )
-                );
-            }
-            
-            atualizarEstatisticas(dadosFiltrados);
-            renderizarTabela(dadosFiltrados);
-        });
-        
-        // Carregar dados automaticamente se a planilha for pública
-        // window.addEventListener('load', carregarDados);
+        // Dica inicial
+        console.log('💡 Dica: Se der erro CORS, use: python -m http.server 8000');
     </script>
 </body>
 </html>
