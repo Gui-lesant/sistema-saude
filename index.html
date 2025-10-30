@@ -3,552 +3,806 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Unidades de Saúde - Completo</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Gestão de Unidades de Saúde - Passo Fundo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --whatsapp: #25d366;
-            --maps: #4285f4;
-            --email: #ea4335;
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --accent-color: #fbbc05;
+            --light-color: #f8f9fa;
+            --dark-color: #202124;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+
+        [data-theme="dark"] {
+            --light-color: #202124;
+            --dark-color: #f8f9fa;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            transition: all 0.3s ease;
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+
+        .navbar {
+            background-color: var(--primary-color);
         }
-        
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .controls {
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .search-box {
-            margin-bottom: 1rem;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 15px 25px;
-            border: 2px solid #ddd;
-            border-radius: 25px;
-            font-size: 1rem;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            padding: 1.5rem;
-            background: white;
-        }
-        
-        .stat-card {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .btn {
-            padding: 12px 25px;
+
+        .card {
             border: none;
-            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .unit-card {
             cursor: pointer;
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
         }
-        
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-        }
-        
-        th, td {
+
+        .filter-section {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
             padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
+
+        .theme-switch {
             cursor: pointer;
         }
-        
-        th:hover {
-            background: #e9ecef;
+
+        .table-responsive {
+            max-height: 500px;
         }
-        
-        tr:hover {
-            background: #f8f9fa;
+
+        .badge-vaccine {
+            background-color: var(--success-color);
         }
-        
-        .action-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            color: white;
-            font-size: 0.8rem;
+
+        .badge-no-vaccine {
+            background-color: var(--danger-color);
+        }
+
+        .contact-btn {
             margin: 2px;
+        }
+
+        .map-link {
+            color: var(--primary-color);
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
-        
-        .btn-whatsapp { background: var(--whatsapp); }
-        .btn-maps { background: var(--maps); }
-        .btn-call { background: var(--success); }
-        .btn-email { background: var(--email); }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+
+        .map-link:hover {
+            text-decoration: underline;
         }
-        
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-danger { background: #fee2e2; color: #dc2626; }
-        
+
         .loading {
-            padding: 3rem;
-            text-align: center;
-            color: #666;
-            font-size: 1.1rem;
-        }
-        
-        .error {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 1.5rem;
-            margin: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .success {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 1rem;
-            margin: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .contact-actions {
             display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-hospital"></i> Sistema Unidades de Saúde</h1>
-            <p>Gestão completa de unidades e contatos</p>
-        </div>
-        
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Buscar unidades, gerentes, telefones, endereços...">
+    <!-- Cabeçalho -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Brasao_Passo_Fundo.png/200px-Brasao_Passo_Fundo.png" alt="Brasão de Passo Fundo" height="50" class="me-3">
+                <div>
+                    <h1 class="h4 mb-0">Gestão de Unidades de Saúde</h1>
+                    <small>Prefeitura Municipal de Passo Fundo</small>
+                </div>
             </div>
-            <div style="text-align: center;">
-                <button class="btn" onclick="carregarDados()">
-                    <i class="fas fa-sync"></i> Carregar Dados da Planilha
+            <div class="d-flex align-items-center">
+                <div class="form-check form-switch me-3">
+                    <input class="form-check-input theme-switch" type="checkbox" id="themeSwitch">
+                    <label class="form-check-label text-white" for="themeSwitch">
+                        <i class="fas fa-moon"></i>
+                    </label>
+                </div>
+                <button class="btn btn-outline-light btn-sm" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Atualizar
                 </button>
             </div>
         </div>
-        
-        <div id="stats" class="stats" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-number" id="totalUnidades">0</div>
-                <div>Unidades</div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Painel de Resumo -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total de Unidades</h5>
+                        <h2 class="card-text" id="totalUnits">0</h2>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="unidadesAtivas">0</div>
-                <div>Vacinas Ativas</div>
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Salas de Vacina Ativas</h5>
+                        <h2 class="card-text" id="activeVaccineRooms">0</h2>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="unidadesComContato">0</div>
-                <div>Com Contato</div>
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Supervisionadas pela UPF</h5>
+                        <h2 class="card-text" id="upfSupervised">0</h2>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalProfissionais">0</div>
-                <div>Profissionais</div>
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Supervisionadas pelo HSVP</h5>
+                        <h2 class="card-text" id="hsvpSupervised">0</h2>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div id="loading" class="loading">
-            <h3>🚀 Sistema Pronto</h3>
-            <p>Clique em "Carregar Dados da Planilha" para iniciar</p>
+
+        <!-- Gráficos -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Distribuição por Território</h5>
+                        <canvas id="territoryChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Status das Salas de Vacina</h5>
+                        <canvas id="vaccineChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div id="error" class="error" style="display: none;"></div>
-        <div id="success" class="success" style="display: none;"></div>
-        
-        <div id="tabelaContainer" style="display: none;">
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th onclick="ordenarTabela(0)">Unidade</th>
-                            <th onclick="ordenarTabela(1)">Gerente</th>
-                            <th onclick="ordenarTabela(2)">Enfermeiro</th>
-                            <th onclick="ordenarTabela(3)">Téc. Enfermagem</th>
-                            <th onclick="ordenarTabela(4)">Médico</th>
-                            <th onclick="ordenarTabela(5)">Telefone</th>
-                            <th onclick="ordenarTabela(6)">Endereço</th>
-                            <th onclick="ordenarTabela(7)">Sala Vacina</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaBody"></tbody>
-                </table>
+
+        <!-- Filtros e Pesquisa -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="globalSearch" placeholder="Pesquisar por unidade, gerente, enfermeiro, telefone, e-mail...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="vaccineFilter">
+                                    <option value="">Todas as salas de vacina</option>
+                                    <option value="Sim">Sala de vacina ativa</option>
+                                    <option value="Não">Sem sala de vacina ativa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="territoryFilter">
+                                    <option value="">Todos os territórios</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Unidades -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Unidades de Saúde</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-2" id="exportCSV">
+                                <i class="fas fa-file-csv"></i> Exportar CSV
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" id="exportPDF">
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="unitsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Unidade</th>
+                                        <th>Gerente</th>
+                                        <th>Enfermeiro</th>
+                                        <th>Médico</th>
+                                        <th>Telefone</th>
+                                        <th>E-mail</th>
+                                        <th>Endereço</th>
+                                        <th>Sala de Vacina</th>
+                                        <th>Território</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="unitsTableBody">
+                                    <!-- Dados serão carregados aqui -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                Mostrando <span id="showingCount">0</span> de <span id="totalCount">0</span> unidades
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0" id="pagination">
+                                    <!-- Paginação será gerada aqui -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal de Detalhes -->
+    <div class="modal fade" id="unitModal" tabindex="-1" aria-labelledby="unitModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="unitModalLabel">Detalhes da Unidade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="unitModalBody">
+                    <!-- Conteúdo será carregado aqui -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="mt-5 py-3">
+        <div class="container text-center">
+            <p class="mb-0">Sistema de Gestão das Unidades de Saúde &copy; 2023 - Prefeitura Municipal de Passo Fundo</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script>
-        const PLANILHA_ID = '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ';
-        let dadosOriginais = [];
-        let dadosFiltrados = [];
-        let ordenacao = { coluna: 0, direcao: 'asc' };
-        
-        async function carregarDados() {
+        // Configurações
+        const SHEET_ID = '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ';
+        const SHEET_GID = '291026320';
+        const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 minutos
+        const ITEMS_PER_PAGE = 10;
+
+        // Estado da aplicação
+        let unitsData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let territoryChart = null;
+        let vaccineChart = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            loadData();
+            setupEventListeners();
+            setInterval(loadData, UPDATE_INTERVAL);
+        });
+
+        // Configuração do tema
+        function initializeTheme() {
+            const themeSwitch = document.getElementById('themeSwitch');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeSwitch.checked = true;
+            }
+            
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // Carregar dados da planilha
+        async function loadData() {
             try {
-                mostrarLoading('🌐 Conectando com a planilha...');
-                document.getElementById('error').style.display = 'none';
-                
-                const url = `https://docs.google.com/spreadsheets/d/${PLANILHA_ID}/export?format=csv`;
+                showLoading();
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
                 const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
                 
-                if (!response.ok) {
-                    throw new Error(`Erro ${response.status}: Não foi possível acessar a planilha`);
-                }
+                unitsData = parseSheetData(json);
+                filteredData = [...unitsData];
                 
-                const csv = await response.text();
-                processarDados(csv);
+                updateDashboard();
+                updateFilters();
+                renderTable();
+                updateCharts();
                 
+                hideLoading();
             } catch (error) {
-                mostrarErro('Erro ao carregar: ' + error.message);
-                mostrarLoading(false);
+                console.error('Erro ao carregar dados:', error);
+                hideLoading();
+                alert('Erro ao carregar dados. Verifique sua conexão e tente novamente.');
             }
         }
-        
-        function processarDados(csv) {
-            try {
-                const dados = parseCSV(csv);
-                
-                if (dados.length === 0) {
-                    throw new Error('Nenhum dado encontrado na planilha');
-                }
-                
-                dadosOriginais = dados;
-                dadosFiltrados = [...dados];
-                
-                atualizarEstatisticas(dados);
-                renderizarTabela(dados);
-                configurarBusca();
-                
-                mostrarSucesso(`✅ ${dados.length} unidades carregadas com sucesso!`);
-                mostrarLoading(false);
-                
-            } catch (error) {
-                mostrarErro('Erro ao processar dados: ' + error.message);
-                mostrarLoading(false);
-            }
+
+        // Parse dos dados da planilha
+        function parseSheetData(jsonData) {
+            const rows = jsonData.table.rows;
+            const headers = rows[0].c.map(cell => cell ? cell.v : '');
+            
+            return rows.slice(1).map(row => {
+                const unit = {};
+                row.c.forEach((cell, index) => {
+                    const header = headers[index];
+                    unit[header] = cell ? cell.v : '';
+                });
+                return unit;
+            });
         }
-        
-        function parseCSV(csv) {
-            const linhas = csv.split('\n').filter(linha => linha.trim());
-            if (linhas.length < 2) return [];
+
+        // Atualizar painel de resumo
+        function updateDashboard() {
+            document.getElementById('totalUnits').textContent = unitsData.length;
             
-            const cabecalhos = linhas[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-            const dados = [];
+            const activeVaccineRooms = unitsData.filter(unit => 
+                unit['Sala de Vacina Ativa'] === 'Sim').length;
+            document.getElementById('activeVaccineRooms').textContent = activeVaccineRooms;
             
-            for (let i = 1; i < linhas.length; i++) {
-                const linha = linhas[i];
-                if (!linha.trim()) continue;
-                
-                const valores = [];
-                let valorAtual = '';
-                let dentroDeAspas = false;
-                
-                for (let char of linha) {
-                    if (char === '"') {
-                        dentroDeAspas = !dentroDeAspas;
-                    } else if (char === ',' && !dentroDeAspas) {
-                        valores.push(valorAtual.replace(/^"|"$/g, ''));
-                        valorAtual = '';
-                    } else {
-                        valorAtual += char;
+            const upfSupervised = unitsData.filter(unit => 
+                unit.Território && unit.Território.includes('UPF')).length;
+            document.getElementById('upfSupervised').textContent = upfSupervised;
+            
+            const hsvpSupervised = unitsData.filter(unit => 
+                unit.Território && unit.Território.includes('HSVP')).length;
+            document.getElementById('hsvpSupervised').textContent = hsvpSupervised;
+        }
+
+        // Atualizar filtros
+        function updateFilters() {
+            const territoryFilter = document.getElementById('territoryFilter');
+            const territories = [...new Set(unitsData.map(unit => unit.Território).filter(Boolean))];
+            
+            // Limpar opções existentes (exceto a primeira)
+            while (territoryFilter.options.length > 1) {
+                territoryFilter.remove(1);
+            }
+            
+            // Adicionar territórios
+            territories.forEach(territory => {
+                const option = document.createElement('option');
+                option.value = territory;
+                option.textContent = territory;
+                territoryFilter.appendChild(option);
+            });
+        }
+
+        // Renderizar tabela
+        function renderTable() {
+            const tableBody = document.getElementById('unitsTableBody');
+            tableBody.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            pageData.forEach(unit => {
+                const row = document.createElement('tr');
+                row.className = 'unit-card';
+                row.innerHTML = `
+                    <td>${unit.Unidade || ''}</td>
+                    <td>${unit.Gerente || ''}</td>
+                    <td>${unit.Enfermeiro || ''}</td>
+                    <td>${unit.Médico || ''}</td>
+                    <td>${unit.Telefone || ''}</td>
+                    <td>${unit['E-mail'] || ''}</td>
+                    <td>
+                        ${unit.Endereço ? 
+                            `<a href="https://maps.google.com/?q=${encodeURIComponent(unit.Endereço)}" target="_blank" class="map-link">
+                                <i class="fas fa-map-marker-alt"></i> ${unit.Endereço}
+                            </a>` : 
+                            ''}
+                    </td>
+                    <td>
+                        ${unit['Sala de Vacina Ativa'] === 'Sim' ? 
+                            '<span class="badge badge-vaccine bg-success">Sim</span>' : 
+                            '<span class="badge badge-no-vaccine bg-danger">Não</span>'}
+                    </td>
+                    <td>${unit.Território || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary view-details" data-unit='${JSON.stringify(unit).replace(/'/g, "&#39;")}'>
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            updatePagination();
+            updateShowingCount();
+            
+            // Adicionar event listeners para os botões de detalhes
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const unitData = JSON.parse(this.getAttribute('data-unit').replace(/&#39;/g, "'"));
+                    showUnitDetails(unitData);
+                });
+            });
+        }
+
+        // Atualizar paginação
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            
+            // Botão anterior
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Anterior</a>`;
+            pagination.appendChild(prevLi);
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+                pagination.appendChild(li);
+            }
+            
+            // Botão próximo
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Próximo</a>`;
+            pagination.appendChild(nextLi);
+            
+            // Adicionar event listeners para os links de paginação
+            pagination.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = parseInt(this.getAttribute('data-page'));
+                    if (page >= 1 && page <= totalPages) {
+                        currentPage = page;
+                        renderTable();
+                    }
+                });
+            });
+        }
+
+        // Atualizar contador de itens mostrados
+        function updateShowingCount() {
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE - 1, filteredData.length);
+            
+            document.getElementById('showingCount').textContent = 
+                filteredData.length > 0 ? `${startIndex}-${endIndex}` : '0';
+            document.getElementById('totalCount').textContent = filteredData.length;
+        }
+
+        // Atualizar gráficos
+        function updateCharts() {
+            // Gráfico de territórios
+            const territoryCtx = document.getElementById('territoryChart').getContext('2d');
+            const territories = [...new Set(unitsData.map(unit => unit.Território).filter(Boolean))];
+            const territoryCounts = territories.map(territory => 
+                unitsData.filter(unit => unit.Território === territory).length
+            );
+            
+            if (territoryChart) {
+                territoryChart.destroy();
+            }
+            
+            territoryChart = new Chart(territoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: territories,
+                    datasets: [{
+                        label: 'Unidades por Território',
+                        data: territoryCounts,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
                     }
                 }
-                valores.push(valorAtual.replace(/^"|"$/g, ''));
-                
-                const registro = {};
-                cabecalhos.forEach((cabecalho, index) => {
-                    registro[cabecalho] = valores[index] || '';
-                });
-                
-                if (registro.UNIDADE && registro.UNIDADE.trim()) {
-                    dados.push(registro);
-                }
+            });
+            
+            // Gráfico de salas de vacina
+            const vaccineCtx = document.getElementById('vaccineChart').getContext('2d');
+            const vaccineActive = unitsData.filter(unit => unit['Sala de Vacina Ativa'] === 'Sim').length;
+            const vaccineInactive = unitsData.length - vaccineActive;
+            
+            if (vaccineChart) {
+                vaccineChart.destroy();
             }
             
-            return dados;
+            vaccineChart = new Chart(vaccineCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ativas', 'Inativas'],
+                    datasets: [{
+                        data: [vaccineActive, vaccineInactive],
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.7)',
+                            'rgba(220, 53, 69, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(220, 53, 69, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
         }
-        
-        function atualizarEstatisticas(dados) {
-            const totalUnidades = dados.length;
-            const unidadesAtivas = dados.filter(d => 
-                d['SALA DE VACINA ATIVA'] && d['SALA DE VACINA ATIVA'].toUpperCase() === 'SIM'
-            ).length;
-            const unidadesComContato = dados.filter(d => 
-                d.TELEFONE && d.TELEFONE.trim()
-            ).length;
+
+        // Mostrar detalhes da unidade
+        function showUnitDetails(unit) {
+            const modalBody = document.getElementById('unitModalBody');
             
-            const totalProfissionais = dados.reduce((total, unidade) => {
-                return total + 
-                    (parseInt(unidade.ENFERMEIRO) || 0) +
-                    (parseInt(unidade['TEC. ENFERMAGEM']) || 0) +
-                    (parseInt(unidade.MEDICO) || 0);
-            }, 0);
+            let detailsHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Informações da Unidade</h5>
+                        <table class="table table-sm">
+                            <tbody>
+                                ${Object.entries(unit).map(([key, value]) => `
+                                    <tr>
+                                        <th>${key}</th>
+                                        <td>${value || 'Não informado'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Contatos Rápidos</h5>
+                        <div class="d-grid gap-2">
+            `;
             
-            document.getElementById('totalUnidades').textContent = totalUnidades;
-            document.getElementById('unidadesAtivas').textContent = unidadesAtivas;
-            document.getElementById('unidadesComContato').textContent = unidadesComContato;
-            document.getElementById('totalProfissionais').textContent = totalProfissionais;
+            // Botões de ação
+            if (unit.Telefone) {
+                const cleanPhone = unit.Telefone.replace(/\D/g, '');
+                detailsHTML += `
+                    <a href="tel:${cleanPhone}" class="btn btn-outline-primary contact-btn">
+                        <i class="fas fa-phone"></i> Ligar: ${unit.Telefone}
+                    </a>
+                    <a href="https://wa.me/55${cleanPhone}" target="_blank" class="btn btn-outline-success contact-btn">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                `;
+            }
             
-            document.getElementById('stats').style.display = 'grid';
+            if (unit['E-mail']) {
+                detailsHTML += `
+                    <a href="mailto:${unit['E-mail']}" class="btn btn-outline-info contact-btn">
+                        <i class="fas fa-envelope"></i> E-mail: ${unit['E-mail']}
+                    </a>
+                `;
+            }
+            
+            if (unit.Endereço) {
+                detailsHTML += `
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(unit.Endereço)}" target="_blank" class="btn btn-outline-warning contact-btn">
+                        <i class="fas fa-map-marker-alt"></i> Ver no Google Maps
+                    </a>
+                `;
+            }
+            
+            detailsHTML += `
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modalBody.innerHTML = detailsHTML;
+            document.getElementById('unitModalLabel').textContent = unit.Unidade || 'Detalhes da Unidade';
+            
+            const modal = new bootstrap.Modal(document.getElementById('unitModal'));
+            modal.show();
         }
-        
-        function renderizarTabela(dados) {
-            const tbody = document.getElementById('tabelaBody');
+
+        // Filtrar dados
+        function filterData() {
+            const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
+            const vaccineFilter = document.getElementById('vaccineFilter').value;
+            const territoryFilter = document.getElementById('territoryFilter').value;
             
-            if (dados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Nenhum dado encontrado</td></tr>';
+            filteredData = unitsData.filter(unit => {
+                // Filtro de pesquisa global
+                const searchMatch = !searchTerm || 
+                    Object.values(unit).some(value => 
+                        value && value.toString().toLowerCase().includes(searchTerm)
+                    );
+                
+                // Filtro de sala de vacina
+                const vaccineMatch = !vaccineFilter || unit['Sala de Vacina Ativa'] === vaccineFilter;
+                
+                // Filtro de território
+                const territoryMatch = !territoryFilter || unit.Território === territoryFilter;
+                
+                return searchMatch && vaccineMatch && territoryMatch;
+            });
+            
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            document.getElementById('globalSearch').addEventListener('input', filterData);
+            document.getElementById('vaccineFilter').addEventListener('change', filterData);
+            document.getElementById('territoryFilter').addEventListener('change', filterData);
+            document.getElementById('refreshBtn').addEventListener('click', loadData);
+            document.getElementById('exportCSV').addEventListener('click', exportCSV);
+            document.getElementById('exportPDF').addEventListener('click', exportPDF);
+        }
+
+        // Exportar para CSV
+        function exportCSV() {
+            if (filteredData.length === 0) {
+                alert('Não há dados para exportar.');
                 return;
             }
             
-            tbody.innerHTML = dados.map(registro => {
-                const unidade = registro.UNIDADE || 'N/A';
-                const gerente = registro.GERENTE || 'N/A';
-                const enfermeiro = registro.ENFERMEIRO || '0';
-                const tecEnfermagem = registro['TEC. ENFERMAGEM'] || '0';
-                const medico = registro.MEDICO || '0';
-                const telefone = registro.TELEFONE || '';
-                const endereco = registro.ENDERECO || registro.ENDEREÇO || 'N/A';
-                const salaVacina = registro['SALA DE VACINA ATIVA'] || '';
-                const email = registro.EMAIL || '';
-                
-                const temWhatsapp = telefone && telefone.replace(/\D/g, '').length >= 10;
-                const temMaps = endereco && endereco !== 'N/A';
-                const temTelefone = telefone && telefone.length > 5;
-                const temEmail = email && email.includes('@');
-                
-                let badgeVacina = 'badge-danger';
-                let textoVacina = 'N/A';
-                
-                if (salaVacina.toUpperCase() === 'SIM') {
-                    badgeVacina = 'badge-success';
-                    textoVacina = 'ATIVA';
-                } else if (salaVacina.toUpperCase() === 'NÃO' || salaVacina.toUpperCase() === 'NAO') {
-                    badgeVacina = 'badge-danger';
-                    textoVacina = 'INATIVA';
-                }
-                
-                return `
-                    <tr>
-                        <td><strong>${escapeHTML(unidade)}</strong></td>
-                        <td>${escapeHTML(gerente)}</td>
-                        <td>${enfermeiro}</td>
-                        <td>${tecEnfermagem}</td>
-                        <td>${medico}</td>
-                        <td>${formatarTelefone(telefone)}</td>
-                        <td>${escapeHTML(endereco)}</td>
-                        <td><span class="badge ${badgeVacina}">${textoVacina}</span></td>
-                        <td>
-                            <div class="contact-actions">
-                                ${temWhatsapp ? `
-                                    <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" 
-                                       target="_blank" 
-                                       class="action-btn btn-whatsapp"
-                                       title="WhatsApp">
-                                        <i class="fab fa-whatsapp"></i>
-                                    </a>
-                                ` : ''}
-                                ${temMaps ? `
-                                    <a href="https://maps.google.com/?q=${encodeURIComponent(endereco)}" 
-                                       target="_blank" 
-                                       class="action-btn btn-maps"
-                                       title="Google Maps">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                    </a>
-                                ` : ''}
-                                ${temTelefone ? `
-                                    <a href="tel:${telefone}" 
-                                       class="action-btn btn-call"
-                                       title="Ligar">
-                                        <i class="fas fa-phone"></i>
-                                    </a>
-                                ` : ''}
-                                ${temEmail ? `
-                                    <a href="mailto:${email}" 
-                                       class="action-btn btn-email"
-                                       title="E-mail">
-                                        <i class="fas fa-envelope"></i>
-                                    </a>
-                                ` : ''}
+            const headers = Object.keys(filteredData[0]);
+            const csvContent = [
+                headers.join(','),
+                ...filteredData.map(row => 
+                    headers.map(header => {
+                        const value = row[header] || '';
+                        return `"${value.toString().replace(/"/g, '""')}"`;
+                    }).join(',')
+                )
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'unidades_saude_passo_fundo.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Exportar para PDF
+        function exportPDF() {
+            if (filteredData.length === 0) {
+                alert('Não há dados para exportar.');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(16);
+            doc.text('Relatório de Unidades de Saúde - Passo Fundo', 14, 15);
+            doc.setFontSize(10);
+            doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 22);
+            
+            // Cabeçalho da tabela
+            const headers = ['Unidade', 'Gerente', 'Telefone', 'E-mail', 'Sala Vacina'];
+            const data = filteredData.map(unit => [
+                unit.Unidade || '',
+                unit.Gerente || '',
+                unit.Telefone || '',
+                unit['E-mail'] || '',
+                unit['Sala de Vacina Ativa'] || ''
+            ]);
+            
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: 30,
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [26, 115, 232] }
+            });
+            
+            doc.save('unidades_saude_passo_fundo.pdf');
+        }
+
+        // Mostrar loading
+        function showLoading() {
+            const tableBody = document.getElementById('unitsTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center">
+                        <div class="loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando...</span>
                             </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-            document.getElementById('tabelaContainer').style.display = 'block';
+                        </div>
+                    </td>
+                </tr>
+            `;
         }
-        
-        function configurarBusca() {
-            document.getElementById('searchInput').addEventListener('input', function(e) {
-                const termo = e.target.value.toLowerCase();
-                
-                if (!termo) {
-                    dadosFiltrados = [...dadosOriginais];
-                } else {
-                    dadosFiltrados = dadosOriginais.filter(registro => 
-                        Object.values(registro).some(valor => 
-                            valor && valor.toString().toLowerCase().includes(termo)
-                        )
-                    );
-                }
-                
-                atualizarEstatisticas(dadosFiltrados);
-                renderizarTabela(dadosFiltrados);
-            });
+
+        // Esconder loading
+        function hideLoading() {
+            // A função renderTable() será chamada após o carregamento
         }
-        
-        function ordenarTabela(colIndex) {
-            if (ordenacao.coluna === colIndex) {
-                ordenacao.direcao = ordenacao.direcao === 'asc' ? 'desc' : 'asc';
-            } else {
-                ordenacao.coluna = colIndex;
-                ordenacao.direcao = 'asc';
-            }
-            
-            dadosFiltrados.sort((a, b) => {
-                const aVal = Object.values(a)[colIndex] || '';
-                const bVal = Object.values(b)[colIndex] || '';
-                
-                if (ordenacao.direcao === 'asc') {
-                    return aVal.toString().localeCompare(bVal.toString(), undefined, { numeric: true });
-                } else {
-                    return bVal.toString().localeCompare(aVal.toString(), undefined, { numeric: true });
-                }
-            });
-            
-            renderizarTabela(dadosFiltrados);
-        }
-        
-        function formatarTelefone(telefone) {
-            if (!telefone) return 'N/A';
-            const numeros = telefone.replace(/\D/g, '');
-            if (numeros.length === 11) {
-                return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-            } else if (numeros.length === 10) {
-                return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-            }
-            return telefone;
-        }
-        
-        function escapeHTML(texto) {
-            if (!texto) return 'N/A';
-            const div = document.createElement('div');
-            div.textContent = texto;
-            return div.innerHTML;
-        }
-        
-        function mostrarLoading(mensagem) {
-            const loading = document.getElementById('loading');
-            if (mensagem === false) {
-                loading.style.display = 'none';
-            } else {
-                loading.style.display = 'block';
-                loading.innerHTML = `<h3>${mensagem}</h3>`;
-            }
-        }
-        
-        function mostrarErro(mensagem) {
-            document.getElementById('error').textContent = mensagem;
-            document.getElementById('error').style.display = 'block';
-        }
-        
-        function mostrarSucesso(mensagem) {
-            document.getElementById('success').textContent = mensagem;
-            document.getElementById('success').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('success').style.display = 'none';
-            }, 5000);
-        }
-        
-        // Carregar automaticamente após 2 segundos
-        setTimeout(() => {
-            carregarDados();
-        }, 2000);
     </script>
 </body>
 </html>
