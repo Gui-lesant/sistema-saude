@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Unidades de Saúde - Versão Local</title>
+    <title>Sistema Unidades de Saúde - Completo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -13,14 +13,21 @@
             --danger: #ef4444;
             --whatsapp: #25d366;
             --maps: #4285f4;
+            --email: #ea4335;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
+            color: #333;
         }
         
         .container {
@@ -37,6 +44,11 @@
             color: white;
             padding: 2rem;
             text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
         }
         
         .controls {
@@ -57,6 +69,27 @@
             font-size: 1rem;
         }
         
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
         .btn {
             padding: 12px 25px;
             border: none;
@@ -68,9 +101,14 @@
             font-size: 1rem;
         }
         
+        .table-container {
+            overflow-x: auto;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1000px;
         }
         
         th, td {
@@ -84,6 +122,15 @@
             font-weight: 600;
             position: sticky;
             top: 0;
+            cursor: pointer;
+        }
+        
+        th:hover {
+            background: #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
         }
         
         .action-btn {
@@ -103,19 +150,31 @@
         .btn-whatsapp { background: var(--whatsapp); }
         .btn-maps { background: var(--maps); }
         .btn-call { background: var(--success); }
+        .btn-email { background: var(--email); }
         
-        .loading { 
-            padding: 3rem; 
-            text-align: center; 
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #dc2626; }
+        
+        .loading {
+            padding: 3rem;
+            text-align: center;
             color: #666;
             font-size: 1.1rem;
         }
         
-        .error { 
-            background: #fee2e2; 
-            color: #dc2626; 
-            padding: 1.5rem; 
-            margin: 1rem; 
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 1.5rem;
+            margin: 1rem;
             border-radius: 10px;
             text-align: center;
         }
@@ -128,13 +187,19 @@
             border-radius: 10px;
             text-align: center;
         }
+        
+        .contact-actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-hospital"></i> Sistema Unidades de Saúde</h1>
-            <p>Gestão de unidades e contatos - Versão Otimizada</p>
+            <p>Gestão completa de unidades e contatos</p>
         </div>
         
         <div class="controls">
@@ -148,28 +213,46 @@
             </div>
         </div>
         
+        <div id="stats" class="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUnidades">0</div>
+                <div>Unidades</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="unidadesAtivas">0</div>
+                <div>Vacinas Ativas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="unidadesComContato">0</div>
+                <div>Com Contato</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalProfissionais">0</div>
+                <div>Profissionais</div>
+            </div>
+        </div>
+        
         <div id="loading" class="loading">
             <h3>🚀 Sistema Pronto</h3>
-            <p>Clique no botão acima para carregar os dados da planilha</p>
-            <p><small>Se aparecer erro de CORS, use um servidor local simples</small></p>
+            <p>Clique em "Carregar Dados da Planilha" para iniciar</p>
         </div>
         
         <div id="error" class="error" style="display: none;"></div>
         <div id="success" class="success" style="display: none;"></div>
         
         <div id="tabelaContainer" style="display: none;">
-            <div style="overflow-x: auto;">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Unidade</th>
-                            <th>Gerente</th>
-                            <th>Enfermeiro</th>
-                            <th>Téc. Enfermagem</th>
-                            <th>Médico</th>
-                            <th>Telefone</th>
-                            <th>Endereço</th>
-                            <th>Sala Vacina</th>
+                            <th onclick="ordenarTabela(0)">Unidade</th>
+                            <th onclick="ordenarTabela(1)">Gerente</th>
+                            <th onclick="ordenarTabela(2)">Enfermeiro</th>
+                            <th onclick="ordenarTabela(3)">Téc. Enfermagem</th>
+                            <th onclick="ordenarTabela(4)">Médico</th>
+                            <th onclick="ordenarTabela(5)">Telefone</th>
+                            <th onclick="ordenarTabela(6)">Endereço</th>
+                            <th onclick="ordenarTabela(7)">Sala Vacina</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -183,112 +266,45 @@
         const PLANILHA_ID = '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ';
         let dadosOriginais = [];
         let dadosFiltrados = [];
+        let ordenacao = { coluna: 0, direcao: 'asc' };
         
         async function carregarDados() {
             try {
                 mostrarLoading('🌐 Conectando com a planilha...');
                 document.getElementById('error').style.display = 'none';
                 
-                // URL alternativa que funciona melhor com CORS
                 const url = `https://docs.google.com/spreadsheets/d/${PLANILHA_ID}/export?format=csv`;
-                
-                console.log('📡 Tentando acessar:', url);
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'text/csv'
-                    }
-                });
+                const response = await fetch(url);
                 
                 if (!response.ok) {
-                    // Tentar método alternativo
-                    await tentarMetodoAlternativo();
-                    return;
+                    throw new Error(`Erro ${response.status}: Não foi possível acessar a planilha`);
                 }
                 
                 const csv = await response.text();
                 processarDados(csv);
                 
             } catch (error) {
-                console.error('❌ Erro principal:', error);
-                await tentarMetodoAlternativo();
+                mostrarErro('Erro ao carregar: ' + error.message);
+                mostrarLoading(false);
             }
-        }
-        
-        async function tentarMetodoAlternativo() {
-            try {
-                mostrarLoading('🔄 Tentando método alternativo...');
-                
-                // Método alternativo usando JSON
-                const url = `https://spreadsheets.google.com/feeds/cells/${PLANILHA_ID}/1/public/full?alt=json`;
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Não foi possível acessar a planilha. Verifique se ela está pública.`);
-                }
-                
-                const data = await response.json();
-                const csv = converterJSONparaCSV(data);
-                processarDados(csv);
-                
-            } catch (error) {
-                console.error('❌ Erro método alternativo:', error);
-                mostrarErro(`
-                    <h3>🔒 Erro de Acesso</h3>
-                    <p><strong>Problema:</strong> ${error.message}</p>
-                    <p><strong>Soluções:</strong></p>
-                    <ol>
-                        <li>Verifique se a planilha está pública (Compartilhar → Qualquer um com o link pode visualizar)</li>
-                        <li>Use um servidor local simples:
-                            <br><code>python -m http.server 8000</code>
-                            <br>Depois acesse: <code>http://localhost:8000</code>
-                        </li>
-                        <li>Hospede no GitHub Pages (recomendado)</li>
-                    </ol>
-                `);
-            }
-        }
-        
-        function converterJSONparaCSV(data) {
-            // Implementação simplificada para converter JSON do Google Sheets para CSV
-            const entries = data.feed.entry;
-            const maxRow = Math.max(...entries.map(entry => parseInt(entry.gs$cell.row)));
-            const maxCol = Math.max(...entries.map(entry => parseInt(entry.gs$cell.col)));
-            
-            let csv = '';
-            for (let row = 1; row <= maxRow; row++) {
-                const rowData = [];
-                for (let col = 1; col <= maxCol; col++) {
-                    const cell = entries.find(entry => 
-                        parseInt(entry.gs$cell.row) === row && 
-                        parseInt(entry.gs$cell.col) === col
-                    );
-                    rowData.push(cell ? `"${cell.gs$cell.$t}"` : '');
-                }
-                csv += rowData.join(',') + '\n';
-            }
-            return csv;
         }
         
         function processarDados(csv) {
             try {
-                console.log('📊 Processando CSV:', csv.substring(0, 200) + '...');
-                
                 const dados = parseCSV(csv);
                 
                 if (dados.length === 0) {
-                    throw new Error('Planilha vazia ou formato não reconhecido');
+                    throw new Error('Nenhum dado encontrado na planilha');
                 }
                 
                 dadosOriginais = dados;
                 dadosFiltrados = [...dados];
                 
-                mostrarSucesso(`✅ ${dados.length} unidades carregadas com sucesso!`);
+                atualizarEstatisticas(dados);
                 renderizarTabela(dados);
                 configurarBusca();
+                
+                mostrarSucesso(`✅ ${dados.length} unidades carregadas com sucesso!`);
                 mostrarLoading(false);
                 
             } catch (error) {
@@ -303,8 +319,6 @@
             
             const cabecalhos = linhas[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
             const dados = [];
-            
-            console.log('📋 Cabeçalhos detectados:', cabecalhos);
             
             for (let i = 1; i < linhas.length; i++) {
                 const linha = linhas[i];
@@ -331,13 +345,36 @@
                     registro[cabecalho] = valores[index] || '';
                 });
                 
-                // Só adiciona se tiver nome da unidade
                 if (registro.UNIDADE && registro.UNIDADE.trim()) {
                     dados.push(registro);
                 }
             }
             
             return dados;
+        }
+        
+        function atualizarEstatisticas(dados) {
+            const totalUnidades = dados.length;
+            const unidadesAtivas = dados.filter(d => 
+                d['SALA DE VACINA ATIVA'] && d['SALA DE VACINA ATIVA'].toUpperCase() === 'SIM'
+            ).length;
+            const unidadesComContato = dados.filter(d => 
+                d.TELEFONE && d.TELEFONE.trim()
+            ).length;
+            
+            const totalProfissionais = dados.reduce((total, unidade) => {
+                return total + 
+                    (parseInt(unidade.ENFERMEIRO) || 0) +
+                    (parseInt(unidade['TEC. ENFERMAGEM']) || 0) +
+                    (parseInt(unidade.MEDICO) || 0);
+            }, 0);
+            
+            document.getElementById('totalUnidades').textContent = totalUnidades;
+            document.getElementById('unidadesAtivas').textContent = unidadesAtivas;
+            document.getElementById('unidadesComContato').textContent = unidadesComContato;
+            document.getElementById('totalProfissionais').textContent = totalProfissionais;
+            
+            document.getElementById('stats').style.display = 'grid';
         }
         
         function renderizarTabela(dados) {
@@ -357,9 +394,23 @@
                 const telefone = registro.TELEFONE || '';
                 const endereco = registro.ENDERECO || registro.ENDEREÇO || 'N/A';
                 const salaVacina = registro['SALA DE VACINA ATIVA'] || '';
+                const email = registro.EMAIL || '';
                 
                 const temWhatsapp = telefone && telefone.replace(/\D/g, '').length >= 10;
                 const temMaps = endereco && endereco !== 'N/A';
+                const temTelefone = telefone && telefone.length > 5;
+                const temEmail = email && email.includes('@');
+                
+                let badgeVacina = 'badge-danger';
+                let textoVacina = 'N/A';
+                
+                if (salaVacina.toUpperCase() === 'SIM') {
+                    badgeVacina = 'badge-success';
+                    textoVacina = 'ATIVA';
+                } else if (salaVacina.toUpperCase() === 'NÃO' || salaVacina.toUpperCase() === 'NAO') {
+                    badgeVacina = 'badge-danger';
+                    textoVacina = 'INATIVA';
+                }
                 
                 return `
                     <tr>
@@ -370,37 +421,37 @@
                         <td>${medico}</td>
                         <td>${formatarTelefone(telefone)}</td>
                         <td>${escapeHTML(endereco)}</td>
+                        <td><span class="badge ${badgeVacina}">${textoVacina}</span></td>
                         <td>
-                            <span style="
-                                padding: 4px 8px; 
-                                border-radius: 12px; 
-                                font-size: 0.8rem;
-                                background: ${salaVacina === 'SIM' ? '#d1fae5' : '#fee2e2'};
-                                color: ${salaVacina === 'SIM' ? '#065f46' : '#dc2626'};
-                            ">
-                                ${salaVacina || 'N/A'}
-                            </span>
-                        </td>
-                        <td>
-                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <div class="contact-actions">
                                 ${temWhatsapp ? `
                                     <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" 
                                        target="_blank" 
-                                       class="action-btn btn-whatsapp">
-                                        <i class="fab fa-whatsapp"></i> WhatsApp
+                                       class="action-btn btn-whatsapp"
+                                       title="WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
                                     </a>
                                 ` : ''}
                                 ${temMaps ? `
                                     <a href="https://maps.google.com/?q=${encodeURIComponent(endereco)}" 
                                        target="_blank" 
-                                       class="action-btn btn-maps">
-                                        <i class="fas fa-map-marker-alt"></i> Maps
+                                       class="action-btn btn-maps"
+                                       title="Google Maps">
+                                        <i class="fas fa-map-marker-alt"></i>
                                     </a>
                                 ` : ''}
-                                ${telefone ? `
+                                ${temTelefone ? `
                                     <a href="tel:${telefone}" 
-                                       class="action-btn btn-call">
-                                        <i class="fas fa-phone"></i> Ligar
+                                       class="action-btn btn-call"
+                                       title="Ligar">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                ` : ''}
+                                ${temEmail ? `
+                                    <a href="mailto:${email}" 
+                                       class="action-btn btn-email"
+                                       title="E-mail">
+                                        <i class="fas fa-envelope"></i>
                                     </a>
                                 ` : ''}
                             </div>
@@ -426,8 +477,31 @@
                     );
                 }
                 
+                atualizarEstatisticas(dadosFiltrados);
                 renderizarTabela(dadosFiltrados);
             });
+        }
+        
+        function ordenarTabela(colIndex) {
+            if (ordenacao.coluna === colIndex) {
+                ordenacao.direcao = ordenacao.direcao === 'asc' ? 'desc' : 'asc';
+            } else {
+                ordenacao.coluna = colIndex;
+                ordenacao.direcao = 'asc';
+            }
+            
+            dadosFiltrados.sort((a, b) => {
+                const aVal = Object.values(a)[colIndex] || '';
+                const bVal = Object.values(b)[colIndex] || '';
+                
+                if (ordenacao.direcao === 'asc') {
+                    return aVal.toString().localeCompare(bVal.toString(), undefined, { numeric: true });
+                } else {
+                    return bVal.toString().localeCompare(aVal.toString(), undefined, { numeric: true });
+                }
+            });
+            
+            renderizarTabela(dadosFiltrados);
         }
         
         function formatarTelefone(telefone) {
@@ -435,6 +509,8 @@
             const numeros = telefone.replace(/\D/g, '');
             if (numeros.length === 11) {
                 return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (numeros.length === 10) {
+                return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
             }
             return telefone;
         }
@@ -457,9 +533,8 @@
         }
         
         function mostrarErro(mensagem) {
-            document.getElementById('error').innerHTML = mensagem;
+            document.getElementById('error').textContent = mensagem;
             document.getElementById('error').style.display = 'block';
-            mostrarLoading(false);
         }
         
         function mostrarSucesso(mensagem) {
@@ -470,8 +545,10 @@
             }, 5000);
         }
         
-        // Dica inicial
-        console.log('💡 Dica: Se der erro CORS, use: python -m http.server 8000');
+        // Carregar automaticamente após 2 segundos
+        setTimeout(() => {
+            carregarDados();
+        }, 2000);
     </script>
 </body>
 </html>
