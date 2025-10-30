@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Unidades de Saúde</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Todo o CSS anterior funciona aqui */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --whatsapp: #25D366;
+            --maps: #4285F4;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .controls {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .search-box {
+            margin-bottom: 1rem;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-whatsapp { background: var(--whatsapp); }
+        .btn-maps { background: var(--maps); }
+        .btn-call { background: var(--success); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-hospital"></i> Sistema Unidades de Saúde</h1>
+            <p>Tabela Dinâmica com Contatos - Versão Independente</p>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Pesquisar unidades, gerentes, telefones...">
+            </div>
+            <div>
+                <button onclick="carregarDados()" class="btn" style="background: var(--secondary);">
+                    <i class="fas fa-sync"></i> Carregar Dados
+                </button>
+            </div>
+        </div>
+        
+        <div id="loading" style="padding: 2rem; text-align: center;">
+            <div>Clique em "Carregar Dados" para iniciar</div>
+        </div>
+        
+        <div id="tabelaContainer" style="display: none;">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Unidade</th>
+                            <th>Gerente</th>
+                            <th>Enfermeiro</th>
+                            <th>Telefone</th>
+                            <th>Endereço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO - SUA PLANILHA DO GOOGLE SHEETS
+        const PLANILHA_ID = '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ';
+        const API_KEY = 'SUA_CHAVE_API_GOOGLE'; // Opcional para planilhas públicas
+        
+        async function carregarDados() {
+            try {
+                mostrarLoading(true);
+                
+                // URL da planilha pública (formato CSV)
+                const url = `https://docs.google.com/spreadsheets/d/${PLANILHA_ID}/gviz/tq?tqx=out:csv`;
+                
+                const response = await fetch(url);
+                const csvData = await response.text();
+                
+                const dados = parseCSV(csvData);
+                renderizarTabela(dados);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar dados: ' + error.message);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+        
+        function parseCSV(csv) {
+            const linhas = csv.split('\n');
+            const cabecalhos = linhas[0].split(',').map(h => h.replace(/"/g, '').trim());
+            
+            const dados = [];
+            for (let i = 1; i < linhas.length; i++) {
+                if (!linhas[i].trim()) continue;
+                
+                const valores = linhas[i].split(',').map(v => v.replace(/"/g, '').trim());
+                const linha = {};
+                
+                cabecalhos.forEach((cabecalho, index) => {
+                    linha[cabecalho] = valores[index] || '';
+                });
+                
+                dados.push(linha);
+            }
+            
+            return dados;
+        }
+        
+        function renderizarTabela(dados) {
+            const tbody = document.getElementById('tabelaBody');
+            
+            if (dados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum dado encontrado</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = dados.map(linha => {
+                const telefone = linha.TELEFONE || linha.TEL || '';
+                const endereco = linha.ENDERECO || linha.ENDEREÇO || '';
+                
+                return `
+                    <tr>
+                        <td><strong>${linha.UNIDADE || 'N/A'}</strong></td>
+                        <td>${linha.GERENTE || 'N/A'}</td>
+                        <td>${linha.ENFERMEIRO || '0'}</td>
+                        <td>${formatarTelefone(telefone)}</td>
+                        <td>${endereco}</td>
+                        <td>
+                            ${telefone ? `
+                                <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" target="_blank" class="btn btn-whatsapp">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                                <a href="tel:${telefone}" class="btn btn-call">
+                                    <i class="fas fa-phone"></i> Ligar
+                                </a>
+                            ` : ''}
+                            ${endereco ? `
+                                <a href="https://maps.google.com/?q=${encodeURIComponent(endereco)}" target="_blank" class="btn btn-maps">
+                                    <i class="fas fa-map-marker-alt"></i> Maps
+                                </a>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('tabelaContainer').style.display = 'block';
+        }
+        
+        function formatarTelefone(telefone) {
+            if (!telefone) return 'N/A';
+            const numeros = telefone.replace(/\D/g, '');
+            if (numeros.length === 11) {
+                return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            }
+            return telefone;
+        }
+        
+        function mostrarLoading(mostrar) {
+            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+        }
+        
+        // Busca em tempo real
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const termo = e.target.value.toLowerCase();
+            const linhas = document.querySelectorAll('#tabelaBody tr');
+            
+            linhas.forEach(linha => {
+                const texto = linha.textContent.toLowerCase();
+                linha.style.display = texto.includes(termo) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
