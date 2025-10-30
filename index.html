@@ -11,9 +11,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
     <style>
         .loading {
             display: inline-block;
@@ -29,47 +26,19 @@
             to { transform: rotate(360deg); }
         }
         
-        .card-hover {
-            transition: all 0.3s ease;
+        .table-hover tr:hover {
+            background-color: #f9fafb;
         }
         
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .contact-card {
-            border-left: 4px solid;
-            transition: all 0.3s ease;
-        }
-        
-        .contact-card:hover {
-            transform: translateX(5px);
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
+        .view-active {
+            background-color: #3b82f6;
+            color: white;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b sticky top-0 z-40">
+    <header class="bg-white shadow-sm border-b">
         <div class="container mx-auto px-4 py-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center mb-4 md:mb-0">
@@ -81,9 +50,9 @@
                 </div>
                 
                 <div class="flex items-center space-x-3">
-                    <div class="flex items-center text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                    <div id="connectionStatus" class="flex items-center text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
                         <div class="loading mr-2" style="border-top-color: #059669;"></div>
-                        <span id="connectionStatus">Conectado</span>
+                        <span>Conectando...</span>
                     </div>
                     
                     <button id="refreshBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors shadow-sm">
@@ -95,174 +64,152 @@
     </header>
 
     <div class="container mx-auto px-4 py-6">
-        <!-- Sistema de Filtros Avançados -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-6 fade-in">
-            <div class="flex flex-col lg:flex-row gap-6">
-                <!-- Busca Principal -->
+        <!-- Filtros -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex flex-col lg:flex-row gap-6 mb-4">
+                <!-- Busca -->
                 <div class="flex-1">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-search mr-1"></i> Busca Inteligente
+                        <i class="fas fa-search mr-1"></i> Buscar
                     </label>
                     <div class="relative">
-                        <input type="text" id="searchInput" placeholder="Buscar por unidade, enfermeiro, endereço, telefone..." 
-                               class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm">
+                        <input type="text" id="searchInput" placeholder="Buscar por unidade, enfermeiro, telefone, endereço..." 
+                               class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
                     </div>
                 </div>
                 
-                <!-- Filtro Rápido -->
-                <div class="lg:w-64">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-bolt mr-1"></i> Filtro Rápido
-                    </label>
-                    <select id="quickFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm">
-                        <option value="">Todos os registros</option>
-                        <option value="vacina:Sim">Com Sala de Vacina</option>
-                        <option value="vacina:Não">Sem Sala de Vacina</option>
-                        <option value="tipo:ESF">Apenas ESF</option>
-                        <option value="tipo:UBS">Apenas UBS</option>
-                        <option value="tipo:CAPS">Apenas CAPS</option>
-                        <option value="territorio:UPF">Território UPF</option>
-                        <option value="territorio:UFFS">Território UFFS</option>
-                        <option value="territorio:IMED">Território IMED</option>
-                    </select>
+                <!-- Filtros -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                        <select id="tipoFilter" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                            <option value="">Todos</option>
+                            <option value="ESF">ESF</option>
+                            <option value="UBS">UBS</option>
+                            <option value="CAPS">CAPS</option>
+                            <option value="CAIS">CAIS</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Território</label>
+                        <select id="territorioFilter" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                            <option value="">Todos</option>
+                            <option value="UPF">UPF</option>
+                            <option value="UFFS">UFFS</option>
+                            <option value="IMED">IMED</option>
+                            <option value="FASURGS">FASURGS</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Filtros Avançados -->
-            <div class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 mb-1">Território</span>
-                    <select id="territorioFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
-                        <option value="">Todos</option>
-                        <option value="UPF">UPF</option>
-                        <option value="UFFS">UFFS</option>
-                        <option value="IMED">IMED</option>
-                        <option value="FASURGS">FASURGS</option>
-                    </select>
-                </div>
-                
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 mb-1">Tipo</span>
-                    <select id="tipoFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
-                        <option value="">Todos</option>
-                        <option value="ESF">ESF</option>
-                        <option value="UBS">UBS</option>
-                        <option value="CAPS">CAPS</option>
-                        <option value="CAIS">CAIS</option>
-                        <option value="Amb">Ambulatório</option>
-                    </select>
-                </div>
-                
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 mb-1">Vacina</span>
-                    <select id="vacinaFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
-                        <option value="">Todos</option>
-                        <option value="Sim">Com Vacina</option>
-                        <option value="Não">Sem Vacina</option>
-                    </select>
-                </div>
-                
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 mb-1">Equipe</span>
-                    <select id="equipeFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
-                        <option value="">Todas</option>
-                        <option value="medico">Com Médico</option>
-                        <option value="odonto">Com Odonto</option>
-                        <option value="multi">Com Multi</option>
-                    </select>
-                </div>
-                
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 mb-1">Ordenar</span>
-                    <select id="sortFilter" class="text-sm px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
-                        <option value="unidade:asc">Unidade A-Z</option>
-                        <option value="unidade:desc">Unidade Z-A</option>
-                        <option value="territorio:asc">Território A-Z</option>
-                        <option value="vacina:desc">Vacina Primeiro</option>
-                    </select>
-                </div>
-            </div>
-            
+
             <!-- Controles -->
-            <div class="mt-4 flex justify-between items-center">
+            <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-600" id="resultCount">0 unidades</span>
-                    <span class="text-sm text-gray-400" id="selectedCount"></span>
-                    <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded pulse" id="autoUpdateStatus">
-                        <i class="fas fa-circle mr-1"></i>Atualização automática
-                    </span>
+                    <span class="text-sm text-gray-600" id="resultCount">-</span>
+                    
+                    <!-- Botões de Visualização -->
+                    <div class="flex border border-gray-300 rounded-lg overflow-hidden">
+                        <button id="viewTable" class="px-3 py-2 bg-blue-500 text-white view-active">
+                            <i class="fas fa-table mr-1"></i> Tabela
+                        </button>
+                    </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button id="clearFilters" class="text-sm text-gray-600 hover:text-gray-800 px-3 py-1 rounded border border-gray-300 hover:border-gray-400 transition-colors">
-                        <i class="fas fa-times mr-1"></i> Limpar
-                    </button>
-                    <button id="exportBtn" class="text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition-colors">
-                        <i class="fas fa-file-pdf mr-1"></i> PDF
-                    </button>
-                </div>
+                
+                <button id="clearFilters" class="text-sm text-gray-600 hover:text-gray-800 px-3 py-2 rounded border border-gray-300 hover:border-gray-400 transition-colors">
+                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                </button>
             </div>
         </div>
 
-        <!-- Métricas em Tempo Real -->
+        <!-- Métricas -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-blue-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Total de Unidades</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="totalUnits">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="totalUnits">-</h3>
                     </div>
                     <i class="fas fa-hospital text-blue-500 text-xl"></i>
                 </div>
-                <div class="mt-2 text-xs text-gray-500" id="totalDetail"></div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-green-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Com Sala de Vacina</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="vacinaUnits">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="vacinaUnits">-</h3>
                     </div>
                     <i class="fas fa-syringe text-green-500 text-xl"></i>
                 </div>
-                <div class="mt-2 text-xs text-gray-500" id="vacinaDetail"></div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-purple-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-purple-500">
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Diferentes Territórios</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="territoriosCount">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="territoriosCount">-</h3>
                     </div>
                     <i class="fas fa-map-marker-alt text-purple-500 text-xl"></i>
                 </div>
-                <div class="mt-2 text-xs text-gray-500" id="territorioDetail"></div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-sm p-4 card-hover border-l-4 border-orange-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-orange-500">
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm text-gray-600">Unidades ESF</p>
-                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="esfUnits">0</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="esfUnits">-</h3>
                     </div>
                     <i class="fas fa-user-md text-orange-500 text-xl"></i>
                 </div>
-                <div class="mt-2 text-xs text-gray-500" id="esfDetail"></div>
             </div>
         </div>
 
         <!-- Área de Resultados -->
         <div id="resultsArea">
-            <!-- Vista em Cards -->
-            <div id="cardsView" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 fade-in">
-                <!-- Cards serão gerados aqui -->
-            </div>
-            
             <!-- Estado de Carregamento -->
             <div id="loadingState" class="text-center py-12">
                 <div class="loading mx-auto mb-4" style="border-top-color: #3b82f6; width: 40px; height: 40px;"></div>
-                <p class="text-gray-600">Conectando à planilha oficial...</p>
+                <p class="text-gray-600">Conectando com a planilha oficial...</p>
                 <p class="text-sm text-gray-400 mt-2" id="loadingDetail">Buscando dados em tempo real</p>
+            </div>
+            
+            <!-- Vista em Tabela -->
+            <div id="tableView" class="hidden bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="ordenarTabela('unidade')">
+                                    Unidade <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="ordenarTabela('enfermeiro')">
+                                    Enfermeiro <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="ordenarTabela('gerente')">
+                                    Gerente <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Telefone
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Email
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="ordenarTabela('vacina')">
+                                    Vacina <i class="fas fa-sort ml-1"></i>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="ordenarTabela('territorio')">
+                                    Território <i class="fas fa-sort ml-1"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200 table-hover">
+                            <!-- Dados da tabela serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
             <!-- Estado Sem Resultados -->
@@ -274,133 +221,63 @@
         </div>
     </div>
 
-    <!-- Modal de Detalhes -->
-    <div id="unitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Detalhes da Unidade</h3>
-                        <p class="text-gray-600 mt-1" id="modalSubtitle"></p>
-                    </div>
-                    <button id="closeModal" class="text-gray-400 hover:text-gray-600 bg-white rounded-full p-2 shadow-sm">
-                        <i class="fas fa-times text-lg"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]" id="modalContent">
-                <!-- Conteúdo dinâmico -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t mt-12">
-        <div class="container mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-                <div class="mb-4 md:mb-0">
-                    <p>Dashboard Automático - Dados em tempo real da planilha oficial</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span id="lastUpdate">Carregando dados...</span>
-                    <span>•</span>
-                    <span id="dataSource">Fonte: Planilha Google Sheets</span>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <script>
-        // CONFIGURAÇÃO AUTOMÁTICA
+        // CONFIGURAÇÃO DA PLANILHA
         const CONFIG = {
             spreadsheetId: '1QTPypA8lmlqeSveShPBI4HY9up6cOUcfulGDAyrP_BQ',
-            gid: '291026320',
-            autoRefresh: true,
-            refreshInterval: 30000, // 30 segundos
-            useOpenSheet: true
+            gid: '291026320'
         };
 
         // ESTADO DA APLICAÇÃO
         let appState = {
             allData: [],
             filteredData: [],
+            currentSort: { field: 'unidade', direction: 'asc' },
             filters: {
                 search: '',
-                quick: '',
-                territorio: '',
                 tipo: '',
-                vacina: '',
-                equipe: '',
-                sort: 'unidade:asc'
-            },
-            autoRefreshTimer: null
+                territorio: ''
+            }
         };
 
-        // ELEMENTOS DOM
+        // ELEMENTOS DO DOM
         const elements = {
-            // Filtros
             searchInput: document.getElementById('searchInput'),
-            quickFilter: document.getElementById('quickFilter'),
-            territorioFilter: document.getElementById('territorioFilter'),
             tipoFilter: document.getElementById('tipoFilter'),
-            vacinaFilter: document.getElementById('vacinaFilter'),
-            equipeFilter: document.getElementById('equipeFilter'),
-            sortFilter: document.getElementById('sortFilter'),
+            territorioFilter: document.getElementById('territorioFilter'),
             clearFilters: document.getElementById('clearFilters'),
+            refreshBtn: document.getElementById('refreshBtn'),
             
-            // Resultados
-            cardsView: document.getElementById('cardsView'),
+            tableView: document.getElementById('tableView'),
+            tableBody: document.getElementById('tableBody'),
             loadingState: document.getElementById('loadingState'),
             noResults: document.getElementById('noResults'),
-            resultsArea: document.getElementById('resultsArea'),
+            loadingDetail: document.getElementById('loadingDetail'),
+            connectionStatus: document.getElementById('connectionStatus'),
             
-            // Métricas
-            resultCount: document.getElementById('resultCount'),
-            selectedCount: document.getElementById('selectedCount'),
             totalUnits: document.getElementById('totalUnits'),
             vacinaUnits: document.getElementById('vacinaUnits'),
             territoriosCount: document.getElementById('territoriosCount'),
             esfUnits: document.getElementById('esfUnits'),
-            totalDetail: document.getElementById('totalDetail'),
-            vacinaDetail: document.getElementById('vacinaDetail'),
-            territorioDetail: document.getElementById('territorioDetail'),
-            esfDetail: document.getElementById('esfDetail'),
-            lastUpdate: document.getElementById('lastUpdate'),
-            dataSource: document.getElementById('dataSource'),
-            loadingDetail: document.getElementById('loadingDetail'),
-            connectionStatus: document.getElementById('connectionStatus'),
-            autoUpdateStatus: document.getElementById('autoUpdateStatus'),
-            
-            // Ações
-            refreshBtn: document.getElementById('refreshBtn'),
-            exportBtn: document.getElementById('exportBtn'),
-            
-            // Modal
-            unitModal: document.getElementById('unitModal'),
-            modalTitle: document.getElementById('modalTitle'),
-            modalSubtitle: document.getElementById('modalSubtitle'),
-            modalContent: document.getElementById('modalContent'),
-            closeModal: document.getElementById('closeModal')
+            resultCount: document.getElementById('resultCount')
         };
 
-        // APLICAÇÃO PRINCIPAL - TOTALMENTE AUTOMÁTICA
-        class AutoHealthDashboard {
+        // APLICAÇÃO PRINCIPAL
+        class HealthDashboard {
             constructor() {
-                this.dataManager = new AutoDataManager();
                 this.init();
             }
 
             async init() {
                 this.setupEventListeners();
                 await this.loadData();
-                this.startAutoRefresh();
             }
 
             async loadData() {
                 this.showLoading('Conectando com a planilha...');
                 
                 try {
-                    const data = await this.dataManager.fetchData();
+                    const data = await this.fetchFromSheets();
                     if (data && data.length > 0) {
                         appState.allData = data;
                         this.applyFilters();
@@ -411,35 +288,68 @@
                     }
                 } catch (error) {
                     console.error('Erro ao carregar dados:', error);
-                    this.showError('Erro de conexão. Verificando automaticamente...');
-                    this.updateConnectionStatus('Tentando reconectar...', 'orange');
+                    this.showError('Erro de conexão. Verifique se a planilha está pública.');
+                    this.updateConnectionStatus('Erro de Conexão', 'red');
                 }
+            }
+
+            async fetchFromSheets() {
+                // Usando OpenSheet que funciona sem CORS
+                const response = await fetch(
+                    `https://opensheet.elk.sh/${CONFIG.spreadsheetId}/${CONFIG.gid}`
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Erro na resposta da API');
+                }
+                
+                const data = await response.json();
+                return this.processData(data);
+            }
+
+            processData(data) {
+                return data.map(row => {
+                    // Mapeamento das colunas da planilha real
+                    return {
+                        unidade: row.UNIDADE || '',
+                        enfermeiro: row.ENFERMEIRO || '',
+                        tecnico_enfermagem: row['TEC. ENFERMAGEM'] || '',
+                        medico: row.MEDICO || '',
+                        odonto: row.ODONTO || '',
+                        multi: row.MULTI || '',
+                        acs: row.ACS || '',
+                        ace: row.ACE || '',
+                        gerente: row.GERENTE || '',
+                        email: row.EMAIL || '',
+                        recepcao: row.RECEPÇÃO || '',
+                        sanificacao: row.SANIFICAÇÃO || '',
+                        porteiro: row.PORTEIRO || '',
+                        telefone: row.TELEFONE || '',
+                        endereco: row.ENDEREÇO || '',
+                        sala_vacina_ativa: row['Sala de Vacina ativa'] || '',
+                        atividades: row.Atividades || '',
+                        territorio: row.Território || ''
+                    };
+                }).filter(item => item.unidade && item.unidade.trim() !== '');
             }
 
             applyFilters() {
                 const filters = {
                     search: elements.searchInput.value,
-                    quick: elements.quickFilter.value,
-                    territorio: elements.territorioFilter.value,
                     tipo: elements.tipoFilter.value,
-                    vacina: elements.vacinaFilter.value,
-                    equipe: elements.equipeFilter.value,
-                    sort: elements.sortFilter.value
+                    territorio: elements.territorioFilter.value
                 };
 
                 appState.filters = filters;
                 
-                // Aplicar filtros
                 let filteredData = appState.allData.filter(item => this.filterItem(item, filters));
                 
                 // Ordenar
-                const [sortField, sortDirection] = filters.sort.split(':');
-                filteredData = this.sortData(filteredData, sortField, sortDirection);
+                filteredData = this.sortData(filteredData, appState.currentSort.field, appState.currentSort.direction);
                 
                 appState.filteredData = filteredData;
                 
-                // Atualizar UI
-                this.renderCards(filteredData);
+                this.renderTable(filteredData);
                 this.updateMetrics();
                 this.updateResultCount();
             }
@@ -451,30 +361,17 @@
                     const searchable = [
                         item.unidade, item.enfermeiro, item.gerente,
                         item.endereco, item.telefone, item.email,
-                        item.territorio, item.atividades
+                        item.territorio
                     ].join(' ').toLowerCase();
                     
                     if (!searchable.includes(searchTerm)) return false;
                 }
 
-                // Filtro rápido
-                if (filters.quick) {
-                    const [type, value] = filters.quick.split(':');
-                    if (type === 'vacina' && !item.sala_vacina_ativa?.includes(value)) return false;
-                    if (type === 'tipo' && !item.unidade?.includes(value)) return false;
-                    if (type === 'territorio' && item.territorio !== value) return false;
-                }
-
-                // Filtros individuais
-                if (filters.territorio && item.territorio !== filters.territorio) return false;
+                // Filtro de tipo
                 if (filters.tipo && !item.unidade?.includes(filters.tipo)) return false;
                 
-                if (filters.vacina === 'Sim' && !item.sala_vacina_ativa?.includes('Sim')) return false;
-                if (filters.vacina === 'Não' && item.sala_vacina_ativa?.includes('Sim')) return false;
-                
-                if (filters.equipe === 'medico' && !item.medico) return false;
-                if (filters.equipe === 'odonto' && !item.odonto) return false;
-                if (filters.equipe === 'multi' && !item.multi) return false;
+                // Filtro de território
+                if (filters.territorio && item.territorio !== filters.territorio) return false;
 
                 return true;
             }
@@ -502,100 +399,47 @@
                 });
             }
 
-            renderCards(data) {
+            renderTable(data) {
                 if (data.length === 0) {
                     this.showNoResults();
                     return;
                 }
 
-                elements.cardsView.innerHTML = data.map(unit => this.createCard(unit)).join('');
+                elements.tableBody.innerHTML = data.map(unit => this.createTableRow(unit)).join('');
                 elements.noResults.classList.add('hidden');
-                elements.cardsView.classList.remove('hidden');
+                elements.tableView.classList.remove('hidden');
             }
 
-            createCard(unit) {
-                const territoryColor = this.getTerritoryColor(unit.territorio);
+            createTableRow(unit) {
                 const hasVacina = unit.sala_vacina_ativa?.includes('Sim');
                 
                 return `
-                    <div class="bg-white rounded-lg shadow-sm p-5 card-hover contact-card border-l-4" style="border-left-color: ${territoryColor}">
-                        <div class="flex justify-between items-start mb-3">
-                            <h3 class="font-bold text-gray-800 text-lg leading-tight">${unit.unidade || 'Unidade'}</h3>
-                            <div class="flex flex-col items-end space-y-1">
-                                <span class="text-xs font-medium px-2 py-1 rounded-full ${hasVacina ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                    ${hasVacina ? '💉 Vacina' : '❌ Sem Vacina'}
-                                </span>
-                                ${unit.territorio ? `
-                                    <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                                        ${unit.territorio}
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-2 mb-4">
-                            ${unit.enfermeiro ? `
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <i class="fas fa-user-nurse mr-2 w-4 text-blue-500"></i>
-                                    <span class="truncate" title="${unit.enfermeiro}">${this.formatName(unit.enfermeiro)}</span>
-                                </div>
-                            ` : ''}
-                            
-                            ${unit.gerente ? `
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <i class="fas fa-user-tie mr-2 w-4 text-green-500"></i>
-                                    <span>${unit.gerente}</span>
-                                </div>
-                            ` : ''}
-                            
-                            ${unit.telefone ? `
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <i class="fas fa-phone mr-2 w-4 text-purple-500"></i>
-                                    <span>${unit.telefone}</span>
-                                </div>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="border-t pt-3">
-                            <div class="flex justify-between items-center">
-                                <div class="flex space-x-2">
-                                    ${unit.telefone ? `
-                                        <button onclick="app.openContact('phone', '${this.escapeString(unit.telefone)}')" 
-                                                class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50 transition-colors"
-                                                title="Ligar">
-                                            <i class="fas fa-phone text-sm"></i>
-                                        </button>
-                                        <button onclick="app.openContact('whatsapp', '${this.escapeString(unit.telefone)}')" 
-                                                class="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50 transition-colors"
-                                                title="WhatsApp">
-                                            <i class="fab fa-whatsapp text-sm"></i>
-                                        </button>
-                                    ` : ''}
-                                    
-                                    ${unit.email ? `
-                                        <button onclick="app.openContact('email', '${this.escapeString(unit.email)}')" 
-                                                class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors"
-                                                title="Email">
-                                            <i class="fas fa-envelope text-sm"></i>
-                                        </button>
-                                    ` : ''}
-                                    
-                                    ${unit.endereco ? `
-                                        <button onclick="app.openContact('maps', '${this.escapeString(unit.endereco)}')" 
-                                                class="text-purple-600 hover:text-purple-800 p-2 rounded-full hover:bg-purple-50 transition-colors"
-                                                title="Ver no Maps">
-                                            <i class="fas fa-map-marker-alt text-sm"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
-                                
-                                <button onclick="app.showUnitDetails(${this.escapeString(JSON.stringify(unit))})"
-                                        class="text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center">
-                                    Detalhes <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${unit.unidade}</div>
+                            <div class="text-sm text-gray-500">${unit.endereco || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${this.formatName(unit.enfermeiro)}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${unit.gerente || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${unit.telefone || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${unit.email || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${hasVacina ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${unit.sala_vacina_ativa || 'Não'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${unit.territorio || ''}</div>
+                        </td>
+                    </tr>
                 `;
             }
 
@@ -603,76 +447,50 @@
                 const data = appState.filteredData;
                 const total = data.length;
                 const comVacina = data.filter(u => u.sala_vacina_ativa?.includes('Sim')).length;
-                const territorios = [...new Set(data.map(u => u.territorio).filter(Boolean))];
+                const territorios = new Set(data.map(u => u.territorio).filter(Boolean)).size;
                 const esfCount = data.filter(u => u.unidade?.includes('ESF')).length;
 
                 elements.totalUnits.textContent = total;
                 elements.vacinaUnits.textContent = comVacina;
-                elements.territoriosCount.textContent = territorios.length;
+                elements.territoriosCount.textContent = territorios;
                 elements.esfUnits.textContent = esfCount;
-
-                elements.totalDetail.textContent = `${appState.allData.length} no total`;
-                elements.vacinaDetail.textContent = `${Math.round((comVacina/total)*100)}% das unidades`;
-                elements.territorioDetail.textContent = territorios.join(', ');
-                elements.esfDetail.textContent = `${Math.round((esfCount/total)*100)}% do total`;
             }
 
             updateResultCount() {
                 const total = appState.filteredData.length;
-                const hasFilters = Object.values(appState.filters).some(val => val && val !== 'unidade:asc');
-
                 elements.resultCount.textContent = `${total} unidade${total !== 1 ? 's' : ''}`;
-                
-                if (hasFilters && appState.allData.length !== total) {
-                    elements.selectedCount.textContent = `(${total} de ${appState.allData.length} filtradas)`;
-                } else {
-                    elements.selectedCount.textContent = '';
-                }
             }
 
             updateConnectionStatus(message, color) {
-                elements.connectionStatus.textContent = message;
                 const colors = {
                     green: 'bg-green-50 text-green-600',
                     orange: 'bg-orange-50 text-orange-600',
                     red: 'bg-red-50 text-red-600'
                 };
-                elements.connectionStatus.className = `flex items-center text-sm ${colors[color] || colors.green} px-3 py-1 rounded-full`;
-            }
-
-            startAutoRefresh() {
-                if (CONFIG.autoRefresh) {
-                    appState.autoRefreshTimer = setInterval(async () => {
-                        elements.autoUpdateStatus.classList.add('pulse');
-                        await this.loadData();
-                        setTimeout(() => {
-                            elements.autoUpdateStatus.classList.remove('pulse');
-                        }, 1000);
-                    }, CONFIG.refreshInterval);
-                }
+                elements.connectionStatus.innerHTML = `<i class="fas fa-${color === 'green' ? 'check' : 'exclamation'}-circle mr-2"></i><span>${message}</span>`;
+                elements.connectionStatus.className = `flex items-center text-sm ${colors[color]} px-3 py-1 rounded-full`;
             }
 
             showLoading(message) {
                 elements.loadingState.classList.remove('hidden');
-                elements.cardsView.classList.add('hidden');
+                elements.tableView.classList.add('hidden');
                 elements.noResults.classList.add('hidden');
                 elements.loadingDetail.textContent = message;
             }
 
             hideLoading() {
                 elements.loadingState.classList.add('hidden');
-                elements.lastUpdate.textContent = `Atualizado: ${new Date().toLocaleString('pt-BR')}`;
             }
 
             showNoResults() {
-                elements.cardsView.classList.add('hidden');
+                elements.tableView.classList.add('hidden');
                 elements.loadingState.classList.add('hidden');
                 elements.noResults.classList.remove('hidden');
             }
 
             showError(message) {
-                console.error(message);
-                // Em produção, poderia mostrar um toast
+                this.hideLoading();
+                elements.loadingDetail.textContent = message;
             }
 
             setupEventListeners() {
@@ -683,48 +501,22 @@
                     searchTimeout = setTimeout(() => this.applyFilters(), 300);
                 });
 
-                // Filtros com detecção automática
-                [elements.quickFilter, elements.territorioFilter, elements.tipoFilter, 
-                 elements.vacinaFilter, elements.equipeFilter, elements.sortFilter].forEach(filter => {
+                // Filtros
+                [elements.tipoFilter, elements.territorioFilter].forEach(filter => {
                     filter.addEventListener('change', () => this.applyFilters());
                 });
 
                 // Limpar filtros
                 elements.clearFilters.addEventListener('click', () => {
                     elements.searchInput.value = '';
-                    elements.quickFilter.value = '';
-                    elements.territorioFilter.value = '';
                     elements.tipoFilter.value = '';
-                    elements.vacinaFilter.value = '';
-                    elements.equipeFilter.value = '';
-                    elements.sortFilter.value = 'unidade:asc';
+                    elements.territorioFilter.value = '';
                     this.applyFilters();
                 });
 
-                // Ações
+                // Atualizar dados
                 elements.refreshBtn.addEventListener('click', async () => {
                     await this.loadData();
-                });
-
-                elements.exportBtn.addEventListener('click', () => {
-                    this.exportToPDF();
-                });
-
-                // Modal
-                elements.closeModal.addEventListener('click', () => {
-                    elements.unitModal.classList.add('hidden');
-                });
-
-                elements.unitModal.addEventListener('click', (e) => {
-                    if (e.target === elements.unitModal) {
-                        elements.unitModal.classList.add('hidden');
-                    }
-                });
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        elements.unitModal.classList.add('hidden');
-                    }
                 });
             }
 
@@ -732,221 +524,23 @@
                 if (!name) return '';
                 return name.split('(')[0].split(',')[0].trim();
             }
-
-            getTerritoryColor(territorio) {
-                const colors = {
-                    'UPF': '#3b82f6',
-                    'UFFS': '#10b981', 
-                    'IMED': '#8b5cf6',
-                    'FASURGS': '#f59e0b'
-                };
-                return colors[territorio] || '#6b7280';
-            }
-
-            escapeString(str) {
-                return str ? str.replace(/'/g, "\\'").replace(/"/g, '&quot;') : '';
-            }
-
-            exportToPDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                doc.setFontSize(16);
-                doc.text('Relatório de Unidades de Saúde - Passo Fundo', 20, 20);
-                doc.setFontSize(10);
-                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 30);
-                doc.text(`Total de unidades: ${appState.filteredData.length}`, 20, 40);
-                
-                let y = 50;
-                appState.filteredData.forEach((unit, index) => {
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 20;
-                    }
-                    
-                    doc.setFont(undefined, 'bold');
-                    doc.text(`${index + 1}. ${unit.unidade || 'N/A'}`, 20, y);
-                    y += 6;
-                    
-                    doc.setFont(undefined, 'normal');
-                    if (unit.enfermeiro) {
-                        doc.text(`   Enfermeiro: ${unit.enfermeiro}`, 25, y);
-                        y += 5;
-                    }
-                    if (unit.telefone) {
-                        doc.text(`   Telefone: ${unit.telefone}`, 25, y);
-                        y += 5;
-                    }
-                    if (unit.endereco) {
-                        doc.text(`   Endereço: ${unit.endereco}`, 25, y);
-                        y += 5;
-                    }
-                    y += 3;
-                });
-                
-                doc.save(`unidades-saude-${new Date().toISOString().split('T')[0]}.pdf`);
-            }
-
-            showUnitDetails(unit) {
-                elements.modalTitle.textContent = unit.unidade || 'Unidade de Saúde';
-                elements.modalSubtitle.textContent = unit.territorio ? `Território: ${unit.territorio}` : '';
-                
-                let content = `
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <div class="bg-blue-50 rounded-lg p-4">
-                                <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
-                                    <i class="fas fa-info-circle mr-2"></i> Informações Principais
-                                </h4>
-                                <div class="space-y-2 text-sm">
-                                    ${unit.enfermeiro ? `<p><strong>Enfermeiro:</strong><br>${unit.enfermeiro}</p>` : ''}
-                                    ${unit.gerente ? `<p><strong>Gerente:</strong><br>${unit.gerente}</p>` : ''}
-                                    ${unit.sala_vacina_ativa ? `<p><strong>Sala de Vacina:</strong><br>${unit.sala_vacina_ativa}</p>` : ''}
-                                    ${unit.atividades ? `<p><strong>Atividades:</strong><br>${unit.atividades}</p>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div class="bg-green-50 rounded-lg p-4">
-                                <h4 class="font-semibold text-green-800 mb-2 flex items-center">
-                                    <i class="fas fa-users mr-2"></i> Equipe Completa
-                                </h4>
-                                <div class="space-y-1 text-sm">
-                                    ${unit.tecnico_enfermagem ? `<p><strong>Téc. Enfermagem:</strong><br>${unit.tecnico_enfermagem}</p>` : ''}
-                                    ${unit.medico ? `<p><strong>Médico:</strong><br>${unit.medico}</p>` : ''}
-                                    ${unit.odonto ? `<p><strong>Odonto:</strong><br>${unit.odonto}</p>` : ''}
-                                    ${unit.multi ? `<p><strong>Multiprofissional:</strong><br>${unit.multi}</p>` : ''}
-                                    ${unit.acs ? `<p><strong>ACS:</strong><br>${unit.acs}</p>` : ''}
-                                    ${unit.ace ? `<p><strong>ACE:</strong><br>${unit.ace}</p>` : ''}
-                                </div>
-                            </div>
-                            
-                            <div class="bg-purple-50 rounded-lg p-4">
-                                <h4 class="font-semibold text-purple-800 mb-2 flex items-center">
-                                    <i class="fas fa-address-book mr-2"></i> Contatos
-                                </h4>
-                                <div class="space-y-3">
-                                    ${unit.telefone ? `
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm"><strong>Telefone:</strong><br>${unit.telefone}</span>
-                                            <div class="flex space-x-1">
-                                                <button onclick="app.openContact('phone', '${this.escapeString(unit.telefone)}')" 
-                                                        class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-colors">
-                                                    <i class="fas fa-phone text-sm"></i>
-                                                </button>
-                                                <button onclick="app.openContact('whatsapp', '${this.escapeString(unit.telefone)}')" 
-                                                        class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors">
-                                                    <i class="fab fa-whatsapp text-sm"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${unit.email ? `
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm"><strong>Email:</strong><br>${unit.email}</span>
-                                            <button onclick="app.openContact('email', '${this.escapeString(unit.email)}')" 
-                                                    class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors">
-                                                <i class="fas fa-envelope text-sm"></i>
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${unit.endereco ? `
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm"><strong>Endereço:</strong><br>${unit.endereco}</span>
-                                            <button onclick="app.openContact('maps', '${this.escapeString(unit.endereco)}')" 
-                                                    class="bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full transition-colors">
-                                                <i class="fas fa-map-marker-alt text-sm"></i>
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                elements.modalContent.innerHTML = content;
-                elements.unitModal.classList.remove('hidden');
-            }
         }
 
-        // GERENCIADOR DE DADOS AUTOMÁTICO
-        class AutoDataManager {
-            async fetchData() {
-                try {
-                    const response = await fetch(
-                        `https://opensheet.elk.sh/${CONFIG.spreadsheetId}/${CONFIG.gid}`
-                    );
-                    
-                    if (!response.ok) throw new Error('Erro na API');
-                    
-                    const data = await response.json();
-                    return this.processData(data);
-                } catch (error) {
-                    console.error('Erro ao buscar dados:', error);
-                    return null;
-                }
+        // FUNÇÃO GLOBAL PARA ORDENAÇÃO
+        function ordenarTabela(field) {
+            if (appState.currentSort.field === field) {
+                appState.currentSort.direction = appState.currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                appState.currentSort = { field, direction: 'asc' };
             }
-
-            processData(data) {
-                return data.map(row => ({
-                    unidade: row.UNIDADE || row.unidade || '',
-                    enfermeiro: row.ENFERMEIRO || row.enfermeiro || '',
-                    tecnico_enfermagem: row['TEC. ENFERMAGEM'] || row.tecnico_enfermagem || '',
-                    medico: row.MEDICO || row.medico || '',
-                    odonto: row.ODONTO || row.odonto || '',
-                    multi: row.MULTI || row.multi || '',
-                    acs: row.ACS || row.acs || '',
-                    ace: row.ACE || row.ace || '',
-                    gerente: row.GERENTE || row.gerente || '',
-                    email: row.EMAIL || row.email || '',
-                    recepcao: row.RECEPÇÃO || row.recepcao || '',
-                    sanificacao: row.SANIFICAÇÃO || row.sanificacao || '',
-                    porteiro: row.PORTEIRO || row.porteiro || '',
-                    telefone: row.TELEFONE || row.telefone || '',
-                    endereco: row.ENDEREÇO || row.endereco || '',
-                    sala_vacina_ativa: row['Sala de Vacina ativa'] || row.sala_vacina_ativa || '',
-                    atividades: row.Atividades || row.atividades || '',
-                    territorio: row.Território || row.territorio || ''
-                })).filter(item => item.unidade); // Remove linhas vazias
-            }
-        }
-
-        // INICIALIZAÇÃO AUTOMÁTICA
-        const app = new AutoHealthDashboard();
-
-        // FUNÇÕES GLOBAIS
-        window.app = {
-            showUnitDetails: (unitJson) => {
-                const unit = JSON.parse(unitJson);
-                const dashboard = new AutoHealthDashboard();
-                dashboard.showUnitDetails(unit);
-            },
             
-            openContact: (type, value) => {
-                switch (type) {
-                    case 'phone':
-                        window.open(`tel:${value.replace(/\D/g, '')}`, '_self');
-                        break;
-                    case 'whatsapp':
-                        window.open(`https://wa.me/55${value.replace(/\D/g, '')}`, '_blank');
-                        break;
-                    case 'email':
-                        window.open(`mailto:${value}`, '_blank');
-                        break;
-                    case 'maps':
-                        window.open(`https://maps.google.com/?q=${encodeURIComponent(value + ', Passo Fundo, RS')}`, '_blank');
-                        break;
-                }
-            }
-        };
+            const dashboard = new HealthDashboard();
+            dashboard.applyFilters();
+        }
 
-        // INICIA AUTOMATICAMENTE
+        // INICIALIZAR A APLICAÇÃO
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Dashboard de Saúde - Iniciado Automaticamente');
+            new HealthDashboard();
         });
     </script>
 </body>
